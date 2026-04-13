@@ -340,13 +340,31 @@
   </div>
 
   <div class="panel active sc" id="panel-manual">
-    <div class="grid2">
-      <div class="fg"><label>Name</label><input type="text" id="inp-name" placeholder="e.g. Sarah Jones" oninput="updatePrev()"/></div>
-      <div class="fg"><label>Birthday</label><input type="date" id="inp-date"/></div>
-      <div class="fg"><label>WhatsApp number</label><input type="tel" id="inp-phone" placeholder="+1 212 555 0123"/><span class="hint">Include country code e.g. +1</span></div>
-      <div class="fg"><label>Relationship (optional)</label><input type="text" id="inp-rel" placeholder="e.g. Staff member"/></div>
-      <div class="fg full"><label>Assign to group (optional)</label>
-        <select id="inp-group"><option value="">— No group —</option></select>
+    <!-- One-line quick entry -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;align-items:end;margin-bottom:10px">
+      <div class="fg">
+        <label>First name</label>
+        <input type="text" id="inp-fname" placeholder="Sarah" oninput="updatePrev()"/>
+      </div>
+      <div class="fg">
+        <label>Last name</label>
+        <input type="text" id="inp-lname" placeholder="Jones" oninput="updatePrev()"/>
+      </div>
+      <div class="fg">
+        <label>Birthday</label>
+        <input type="date" id="inp-date"/>
+      </div>
+      <div class="fg">
+        <label>Phone (+1...)</label>
+        <input type="tel" id="inp-phone" placeholder="+17185550001"/>
+      </div>
+    </div>
+
+    <!-- Group checkboxes -->
+    <div style="background:#f8f5ec;border:0.5px solid #d4c5a0;border-radius:8px;padding:8px 12px;margin-bottom:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <span style="font-size:12px;color:#0a1560;font-weight:500;flex-shrink:0">Add to group:</span>
+      <div id="group-checks" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <span style="font-size:12px;color:#aaa" id="no-groups-hint">No groups yet — add one above</span>
       </div>
     </div>
 
@@ -365,7 +383,7 @@
         <div class="msg-prev group" id="prev-group"></div>
       </div>
     </div>
-    <button class="btn btn-full" onclick="addManual()">+ Add birthday</button>
+    <button class="btn btn-full btn-dark" onclick="addManual()">+ Add staff member</button>
   </div>
 
   <div class="panel sc" id="panel-import">
@@ -377,6 +395,52 @@
     <input type="file" id="xl-file" accept=".xlsx,.xls" style="display:none" onchange="handleXL(event)"/>
     <div class="ihint">Column headers in row 1: <strong>Name</strong> · <strong>Birthday</strong> · <strong>Phone</strong> · <strong>Message</strong> · <strong>GroupMessage</strong> (optional)</div>
     <div class="iprev" id="iprev" style="display:none"></div>
+  </div>
+
+  <!-- ── HOLIDAY BROADCAST ── -->
+  <div class="sc" style="border-left:4px solid #C9A84C">
+    <h3 style="color:#B8860B">🎉 Holiday card broadcast</h3>
+    <p>Pick a holiday, write your message, upload a card — then send to all staff at once. WhatsApp opens pre-filled for each person, just hit Send.</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-bottom:14px" id="holiday-grid"></div>
+
+    <div id="holiday-compose" style="display:none">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;background:#f8f5ec;padding:10px 12px;border-radius:8px;border:0.5px solid #d4c5a0">
+        <span style="font-size:22px" id="h-icon"></span>
+        <strong style="font-size:14px;color:#0a1560" id="h-name"></strong>
+        <button onclick="deselectHoliday()" style="margin-left:auto;background:transparent;border:none;font-size:18px;cursor:pointer;color:#aaa;line-height:1">✕</button>
+      </div>
+      <div class="fg" style="margin-bottom:10px">
+        <label>Message to all staff</label>
+        <textarea id="h-msg" rows="3" placeholder="e.g. Wishing you and your family a wonderful Christmas! 🎄"></textarea>
+      </div>
+      <div class="fg" style="margin-bottom:12px">
+        <label>Holiday card image (optional)</label>
+        <div class="card-drop" id="h-card-drop" onclick="document.getElementById('h-card-file').click()" style="padding:0.7rem">
+          <div style="font-size:20px">🖼</div>
+          <p style="font-size:12px;margin-top:4px">Click to upload (JPG or PNG)</p>
+          <input type="file" id="h-card-file" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="handleHolidayCard(event)"/>
+        </div>
+        <div id="h-card-preview" style="display:none;align-items:center;gap:10px;margin-top:8px">
+          <img id="h-card-img" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:0.5px solid #d4c5a0"/>
+          <span style="font-size:12px;color:#555;flex:1" id="h-card-name"></span>
+          <button onclick="removeHolidayCard()" style="background:transparent;border:0.5px solid #d4c5a0;border-radius:6px;padding:3px 8px;font-size:12px;cursor:pointer;color:#888">Remove</button>
+        </div>
+      </div>
+      <div style="background:#f8f5ec;border:0.5px solid #d4c5a0;border-radius:8px;padding:10px 12px;font-size:12px;color:#555;margin-bottom:12px">
+        <strong style="color:#0a1560">Will send to:</strong> <span id="h-staff-count" style="color:#C9A84C;font-weight:500">0</span> staff members.
+        <span style="display:block;margin-top:4px;color:#888">Each WhatsApp opens pre-filled — you just tap Send for each person.</span>
+      </div>
+      <div id="h-broadcast-progress" style="display:none;margin-bottom:10px">
+        <div style="background:#f0ead0;border-radius:8px;height:8px;overflow:hidden">
+          <div id="h-progress-bar" style="background:linear-gradient(90deg,#0a1560,#C9A84C);height:100%;width:0%;transition:width .3s"></div>
+        </div>
+        <p style="font-size:12px;color:#0a1560;margin-top:5px;text-align:center" id="h-progress-lbl">Opening WhatsApp...</p>
+      </div>
+      <button class="btn btn-full" id="h-send-btn" style="background:linear-gradient(90deg,#0a1560,#C9A84C);color:#fff;border:none;padding:10px;font-size:14px;font-weight:500;border-radius:8px;cursor:pointer" onclick="startHolidayBroadcast()">
+        🚀 Send to all staff
+      </button>
+    </div>
   </div>
 
   <!-- ── LIST ── -->
@@ -450,15 +514,29 @@ function removeGroup(id){
 
 function renderGroups(){
   const el=document.getElementById('groups-list');
-  if(!groups.length){el.innerHTML='<span style="font-size:12px;color:#aaa">No groups added yet.</span>';return;}
-  el.innerHTML=groups.map(g=>`<span class="group-tag">${g.name}<span onclick="removeGroup(${g.id})">✕</span></span>`).join('');
+  if(!groups.length){el.innerHTML='<span style="font-size:12px;color:#aaa">No groups added yet.</span>';}
+  else{el.innerHTML=groups.map(g=>`<span class="group-tag">${g.name}<span onclick="removeGroup(${g.id})">✕</span></span>`).join('');}
+  renderGroupCheckboxes();
+}
+
+function renderGroupCheckboxes(){
+  const wrap=document.getElementById('group-checks');
+  const hint=document.getElementById('no-groups-hint');
+  if(!wrap)return;
+  wrap.querySelectorAll('.grp-chk-wrap').forEach(e=>e.remove());
+  if(!groups.length){if(hint)hint.style.display='inline';return;}
+  if(hint)hint.style.display='none';
+  groups.forEach(g=>{
+    const d=document.createElement('label');
+    d.className='grp-chk-wrap';
+    d.style.cssText='display:flex;align-items:center;gap:5px;font-size:13px;color:#0a1560;cursor:pointer;background:#f8f5ec;border:0.5px solid #d4c5a0;border-radius:20px;padding:4px 12px';
+    d.innerHTML=`<input type="checkbox" class="grp-chk" value="${g.id}" style="width:auto;accent-color:#0a1560"/> ${g.name}`;
+    wrap.appendChild(d);
+  });
 }
 
 function updateGroupSelect(){
-  const sel=document.getElementById('inp-group');
-  const cur=sel.value;
-  sel.innerHTML='<option value="">— No group —</option>'+groups.map(g=>`<option value="${g.id}">${g.name}</option>`).join('');
-  if(cur)sel.value=cur;
+  renderGroupCheckboxes();
 }
 
 function getGroup(id){return groups.find(g=>String(g.id)===String(id));}
@@ -577,8 +655,8 @@ function switchMsgTab(t){
 }
 
 function updatePrev(){
-  const n=document.getElementById('inp-name').value.trim();
-  const fn=n.split(' ')[0]||'[Name]';
+  const fname=document.getElementById('inp-fname')?.value.trim()||'';
+  const fn=fname||'[Name]';
   const pm=document.getElementById('inp-msg').value.trim();
   const gm=document.getElementById('inp-gmsg').value.trim();
   const pp=document.getElementById('prev-personal');
@@ -589,17 +667,20 @@ function updatePrev(){
 
 function pushEntry(e){birthdays.push({id:Date.now()+Math.random(),...e,color:COLORS[birthdays.length%COLORS.length]});save();document.getElementById('bday-count').textContent=birthdays.length+' birthday'+(birthdays.length!==1?'s':'');}
 function addManual(){
-  const name=document.getElementById('inp-name').value.trim();
+  const fname=document.getElementById('inp-fname').value.trim();
+  const lname=document.getElementById('inp-lname').value.trim();
+  const name=(fname+' '+lname).trim();
   const date=document.getElementById('inp-date').value;
   const phone=document.getElementById('inp-phone').value.trim();
-  const rel=document.getElementById('inp-rel').value.trim();
   const msg=document.getElementById('inp-msg').value.trim();
   const gmsg=document.getElementById('inp-gmsg').value.trim();
-  const groupId=document.getElementById('inp-group').value;
-  if(!name||!date||!phone){showToast('Please fill in name, birthday, and phone.');return;}
-  pushEntry({name,date,phone,rel,msg:msg||'Wishing you an amazing day! 🎉',gmsg:gmsg||'',groupId:groupId||''});
-  ['inp-name','inp-date','inp-phone','inp-rel','inp-msg','inp-gmsg'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('inp-group').value='';
+  if(!fname||!date||!phone){showToast('Please fill in first name, birthday, and phone.');return;}
+  // get checked groups
+  const checkedGroups=Array.from(document.querySelectorAll('.grp-chk:checked')).map(c=>c.value);
+  const groupId=checkedGroups[0]||'';
+  pushEntry({name,date,phone,rel:'Staff',msg:msg||'Wishing you an amazing day! 🎉',gmsg:gmsg||'',groupId});
+  ['inp-fname','inp-lname','inp-date','inp-phone','inp-msg','inp-gmsg'].forEach(id=>document.getElementById(id).value='');
+  document.querySelectorAll('.grp-chk').forEach(c=>c.checked=false);
   ['prev-personal','prev-group'].forEach(id=>{document.getElementById(id).style.display='none';});
   showToast(name+' added!');render();
 }
@@ -756,13 +837,147 @@ window.addEventListener('load',()=>{
   const saved=JSON.parse(localStorage.getItem('twilio_cfg')||'{}');
   if(saved.sid){document.getElementById('tw-sid').value=saved.sid;document.getElementById('tw-token').value=saved.token||'';document.getElementById('tw-from').value=saved.from||'';document.getElementById('tw-to').value=saved.to||'';document.getElementById('tw-to2').value=saved.to2||'';updateCfgStatus(true);document.querySelectorAll('.wstep').forEach(s=>s.classList.add('done'));goWStep(4);}
   if(cardUrl)showCardPrev();
-  renderGroups();updateGroupSelect();render();
+  renderGroups();updateGroupSelect();renderHolidayGrid();render();
   const todays=birthdays.filter(b=>isToday(b.date));
   if(todays.length===1)showToast('🎂 Today is '+todays[0].name+"'s birthday!",5000);
   else if(todays.length>1)showToast('🎂 '+todays.length+' birthdays today!',5000);
   updateNextLbl();setInterval(updateNextLbl,30000);
 });
 document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+
+// ── Holiday Broadcast ──
+const HOLIDAYS=[
+  {id:'christmas',   icon:'🎄', name:'Christmas',           msg:'Merry Christmas! 🎄 Wishing you and your family a wonderful holiday filled with joy, laughter and love. Thank you for everything you do at Groove FM Radio!'},
+  {id:'newyear',     icon:'🎆', name:'New Year',             msg:"Happy New Year! 🎆 Wishing you health, happiness and success in the year ahead. It's a pleasure having you on the Groove FM Radio team!"},
+  {id:'easter',      icon:'🐣', name:'Easter',               msg:'Happy Easter! 🐣 Wishing you a joyful and blessed day with your loved ones. Thank you for being part of the Groove FM Radio family!'},
+  {id:'thanksgiving',icon:'🦃', name:'Thanksgiving',         msg:'Happy Thanksgiving! 🦃 We are truly grateful to have you on our team. Wishing you a warm celebration with family and friends!'},
+  {id:'halloween',   icon:'🎃', name:'Halloween',            msg:'Happy Halloween! 🎃 Hope your day is full of fun and treats — not too many tricks! From all of us at Groove FM Radio 👻'},
+  {id:'valentines',  icon:'❤️', name:"Valentine's Day",      msg:"Happy Valentine's Day! ❤️ Sending love and appreciation your way. We're so glad you're part of the Groove FM Radio family!"},
+  {id:'mothersday',  icon:'💐', name:"Mother's Day",         msg:"Happy Mother's Day! 💐 To all the amazing mums on our team — we see you, we appreciate you, and we celebrate you today!"},
+  {id:'fathersday',  icon:'👔', name:"Father's Day",         msg:"Happy Father's Day! 👔 To all the wonderful dads at Groove FM Radio — thank you for everything. Have a fantastic day!"},
+  {id:'laborday',    icon:'⭐', name:'Labor Day',             msg:'Happy Labor Day! ⭐ Today we celebrate you and your hard work. Rest and recharge — we appreciate you at Groove FM Radio!'},
+  {id:'independence',icon:'🇺🇸', name:'4th of July',         msg:'Happy 4th of July! 🇺🇸 Wishing you a fun-filled day of celebration. Thank you for being part of the Groove FM Radio team!'},
+  {id:'mlk',         icon:'✊', name:'MLK Day',               msg:'Happy Martin Luther King Jr. Day! ✊ A day to reflect, celebrate and be inspired. From all of us at Groove FM Radio.'},
+  {id:'memorial',    icon:'🎖', name:'Memorial Day',          msg:'Happy Memorial Day! 🎖 We honour and remember all who have served. Wishing you a meaningful and restful day.'},
+  {id:'stpatricks',  icon:'☘️', name:"St. Patrick's Day",    msg:"Happy St. Patrick's Day! ☘️ May the luck of the Irish be with you today! From all of us at Groove FM Radio."},
+  {id:'diwali',      icon:'🪔', name:'Diwali',                msg:'Happy Diwali! 🪔 May this Festival of Lights bring joy, prosperity and peace to you and your family. ✨'},
+  {id:'eid',         icon:'🌙', name:'Eid Mubarak',           msg:'Eid Mubarak! 🌙 Wishing you and your loved ones a blessed and joyful celebration. ⭐'},
+  {id:'hanukkah',    icon:'🕎', name:'Hanukkah',              msg:'Happy Hanukkah! 🕎 Wishing you and your family a season full of light and joy.'},
+  {id:'christmas2',  icon:'🎅', name:"New Year's Eve",        msg:"Happy New Year's Eve! 🎅 Thank you for an amazing year. Looking forward to even greater things with the Groove FM Radio team in the year ahead! 🥂"},
+  {id:'groovefm',    icon:'🎵', name:'Groove FM Anniversary', msg:"Happy Groove FM Anniversary! 🎵 Thank you for being part of our incredible journey. Here's to many more years of great radio! 🎉"},
+];
+
+let selectedHoliday=null;
+let holidayCardUrl=null;
+let holidayBroadcastQueue=[];
+let holidayBroadcastIdx=0;
+
+function renderHolidayGrid(){
+  const grid=document.getElementById('holiday-grid');
+  if(!grid)return;
+  grid.innerHTML=HOLIDAYS.map(h=>`
+    <div onclick="selectHoliday('${h.id}')" style="border:0.5px solid ${selectedHoliday&&selectedHoliday.id===h.id?'#C9A84C':'#d4c5a0'};border-radius:10px;padding:10px 8px;background:${selectedHoliday&&selectedHoliday.id===h.id?'#f8f5ec':'#fff'};cursor:pointer;font-family:inherit;transition:all .15s;text-align:center">
+      <div style="font-size:22px;margin-bottom:4px">${h.icon}</div>
+      <div style="font-size:11px;font-weight:500;color:#0a1560;line-height:1.3">${h.name}</div>
+    </div>`).join('');
+}
+
+function selectHoliday(id){
+  selectedHoliday=HOLIDAYS.find(h=>h.id===id);
+  if(!selectedHoliday)return;
+  document.getElementById('h-icon').textContent=selectedHoliday.icon;
+  document.getElementById('h-name').textContent=selectedHoliday.name;
+  document.getElementById('h-msg').value=selectedHoliday.msg;
+  document.getElementById('h-staff-count').textContent=birthdays.length;
+  document.getElementById('h-broadcast-progress').style.display='none';
+  const btn=document.getElementById('h-send-btn');
+  btn.textContent='🚀 Send to all staff';
+  btn.style.background='linear-gradient(90deg,#0a1560,#C9A84C)';
+  btn.onclick=startHolidayBroadcast;
+  document.getElementById('holiday-compose').style.display='block';
+  document.getElementById('holiday-compose').scrollIntoView({behavior:'smooth',block:'nearest'});
+  renderHolidayGrid();
+}
+
+function deselectHoliday(){
+  selectedHoliday=null;
+  document.getElementById('holiday-compose').style.display='none';
+  renderHolidayGrid();
+}
+
+function handleHolidayCard(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    holidayCardUrl=ev.target.result;
+    document.getElementById('h-card-img').src=holidayCardUrl;
+    document.getElementById('h-card-name').textContent=f.name;
+    document.getElementById('h-card-drop').style.display='none';
+    document.getElementById('h-card-preview').style.display='flex';
+    showToast('Holiday card uploaded!');
+  };
+  r.readAsDataURL(f);
+}
+
+function removeHolidayCard(){
+  holidayCardUrl=null;
+  document.getElementById('h-card-drop').style.display='block';
+  document.getElementById('h-card-preview').style.display='none';
+  document.getElementById('h-card-file').value='';
+}
+
+function startHolidayBroadcast(){
+  if(!birthdays.length){showToast('No staff members added yet.');return;}
+  const msg=document.getElementById('h-msg').value.trim();
+  if(!msg){showToast('Please enter a holiday message.');return;}
+  if(!selectedHoliday)return;
+  holidayBroadcastQueue=[...birthdays];
+  holidayBroadcastIdx=0;
+  document.getElementById('h-broadcast-progress').style.display='block';
+  sendNextHolidayMsg();
+}
+
+function sendNextHolidayMsg(){
+  if(holidayBroadcastIdx>=holidayBroadcastQueue.length){
+    document.getElementById('h-progress-bar').style.width='100%';
+    document.getElementById('h-progress-lbl').textContent='✓ All done! '+holidayBroadcastQueue.length+' messages sent.';
+    const btn=document.getElementById('h-send-btn');
+    btn.textContent='✓ Sent to all '+holidayBroadcastQueue.length+' staff!';
+    btn.style.background='#15803d';
+    showToast('🎉 Holiday broadcast complete!',5000);
+    return;
+  }
+  const b=holidayBroadcastQueue[holidayBroadcastIdx];
+  const fn=b.name.split(' ')[0];
+  const msg=document.getElementById('h-msg').value.trim();
+  const fullMsg=selectedHoliday.icon+' '+selectedHoliday.name+'\n\nDear '+fn+',\n'+msg;
+  const cleaned=(b.phone||'').replace(/[\s\-\(\)]/g,'').replace('+','');
+  const waUrl='https://wa.me/'+cleaned+'?text='+encodeURIComponent(fullMsg);
+
+  const pct=Math.round(((holidayBroadcastIdx+1)/holidayBroadcastQueue.length)*100);
+  document.getElementById('h-progress-bar').style.width=pct+'%';
+  document.getElementById('h-progress-lbl').textContent=(holidayBroadcastIdx+1)+' of '+holidayBroadcastQueue.length+' — '+b.name;
+
+  const remaining=holidayBroadcastQueue.length-holidayBroadcastIdx;
+  const next=holidayBroadcastQueue[holidayBroadcastIdx+1];
+  document.getElementById('m-title').textContent=selectedHoliday.icon+' '+selectedHoliday.name+' — '+b.name;
+  const mi=document.getElementById('m-img');
+  if(holidayCardUrl){mi.src=holidayCardUrl;mi.style.display='block';}else{mi.style.display='none';}
+  document.getElementById('m-body').innerHTML=`
+    <p style="font-size:13px;color:#555;margin-bottom:10px;line-height:1.6">WhatsApp will open pre-filled for <strong>${b.name}</strong>.<br>
+    ${holidayCardUrl?'Tap the 📎 icon, attach your holiday card, then hit ':'Just hit '}<strong>Send</strong>.</p>
+    <p style="font-size:12px;color:#aaa;margin-bottom:12px">${remaining} message${remaining!==1?'s':''} remaining · next: ${next?next.name.split(' ')[0]:'last one!'}</p>
+    <button class="btn btn-full btn-dark" style="margin-bottom:8px" onclick="window.open('${waUrl.replace(/'/g,"\\'")}','_blank')">Open WhatsApp for ${fn} →</button>
+    <button class="btn btn-full btn-green" onclick="advanceHoliday()" style="margin-bottom:0">✓ Sent — Next (${holidayBroadcastIdx+1}/${holidayBroadcastQueue.length})</button>`;
+  document.getElementById('modal').classList.add('open');
+}
+
+function advanceHoliday(){
+  holidayBroadcastIdx++;
+  closeModal();
+  setTimeout(()=>sendNextHolidayMsg(),300);
+}
+
 </script>
 </body>
 </html>
