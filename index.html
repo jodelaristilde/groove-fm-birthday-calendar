@@ -485,42 +485,83 @@ function saveCreds(){
   cloudSave();showToast('✓ Saved & activated!',4000);
 }
 
-// Send SMS via Vercel backend function (no CORS issues)
-async function sendSMS(to, body){
+// ── SMS via Vercel backend ──
+async function sendSMS(to, msgBody){
   const cfg=getTwilioCfg();
-  if(!cfg.sid||!cfg.token||!cfg.from)return{ok:false,error:'Not configured'};
+  if(!cfg.sid||!cfg.token||!cfg.from)return{ok:false,error:'Twilio not configured'};
   try{
-    // Use relative URL — works on Vercel, falls back gracefully locally
-    const endpoint='/api/send-sms';
-    const r=await fetch(endpoint,{
+    const r=await fetch('/api/send-sms',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({to,from:cfg.from,body,accountSid:cfg.sid,authToken:cfg.token})
+      body:JSON.stringify({to,from:cfg.from,body:msgBody,accountSid:cfg.sid,authToken:cfg.token})
     });
-    const data=await r.json();
-    return{ok:r.ok,data};
-  }catch(e){return{ok:false,error:e.message};}
+    let data;
+    try{data=await r.json();}catch(e){data={error:'Non-JSON response from server'};}
+    return{ok:r.ok,status:r.status,data};
+  }catch(e){
+    return{ok:false,error:e.message,networkError:true};
+  }
 }
 
 async function sendTestSMS(){
   const cfg=getTwilioCfg();
-  if(!cfg.sid||!cfg.token||!cfg.from||!cfg.to){showToast('Fill in all credentials in Step 4 first.');goWStep(3);return;}
-  const resultEl=document.getElementById('sms-test-result');
-  resultEl.style.display='block';resultEl.style.background='#fef9e7';resultEl.style.color='#92400e';resultEl.style.border='0.5px solid #fcd34d';
-  resultEl.textContent='Sending test SMS…';
+  const el=document.getElementById('sms-test-result');
+  el.style.display='block';
+
+  function setResult(ok,msg){
+    el.style.background=ok?'#dcfce7':'#fee2e2';
+    el.style.color=ok?'#15803d':'#991b1b';
+    el.style.border='0.5px solid '+(ok?'#86efac':'#fca5a5');
+    el.style.whiteSpace='pre-wrap';
+    el.style.lineHeight='1.6';
+    el.textContent=msg;
+  }
+
+  // Step 1: check credentials filled in
+  if(!cfg.sid){setResult(false,'✗ Account SID is empty.\nGo to Step 4 and paste your Account SID (starts with AC...).');return;}
+  if(!cfg.token){setResult(false,'✗ Auth Token is empty.\nGo to Step 4 and paste your Auth Token.');return;}
+  if(!cfg.from){setResult(false,'✗ Twilio phone number (From) is empty.\nGo to Step 4 and enter your Twilio number e.g. +12025550123');return;}
+  if(!cfg.to){setResult(false,'✗ Your mobile number (To) is empty.\nGo to Step 4 and enter your phone number e.g. +17185550001');return;}
+
+  setResult(false,'⏳ Checking Vercel API function...');
+
+  // Step 2: check if /api/send-sms endpoint exists
+  let pingOk=false;
+  try{
+    const ping=await fetch('/api/send-sms',{method:'OPTIONS'});
+    pingOk=ping.status!==404;
+  }catch(e){pingOk=false;}
+
+  if(!pingOk){
+    setResult(false,'✗ Vercel API function not found.\n\nFix: Make sure you uploaded send-sms.js into a folder called "api" in your GitHub repo.\n\nFile structure should be:\n  your-repo/\n  ├── index.html\n  ├── vercel.json\n  └── api/\n      └── send-sms.js\n\nAfter uploading, Vercel will auto-deploy in ~30 seconds.');
+    return;
+  }
+
+  setResult(false,'⏳ Sending test SMS to '+cfg.to+'...');
+
   const cleaned=cfg.to.replace(/[\s\-\(\)]/g,'').replace('+','');
-  const waLink='https://wa.me/'+cleaned+'?text='+encodeURIComponent("Happy Birthday Test! 🎂\nThis is exactly what you'll receive on birthdays — just tap Send in WhatsApp!");
-  const body='🎂 Groove FM Birthday Reminder test!\n\n"Today is Sarah\'s birthday!"\n\n👤 Tap to open WhatsApp → message pre-filled → just hit Send:\n'+waLink+'\n\nThis message was sent from your Groove FM Birthday Calendar.';
-  const res=await sendSMS(cfg.to,body);
+  const waLink='https://wa.me/'+cleaned+'?text='+encodeURIComponent("Happy Birthday Test! 🎂\nThis is your Groove FM birthday reminder — tap Send to test WhatsApp!");
+  const msgBody='🎂 Groove FM Birthday Calendar — TEST\n\n"Today is Sarah\'s birthday!"\n\nTap to open WhatsApp → message pre-filled → just hit Send:\n'+waLink;
+
+  const res=await sendSMS(cfg.to, msgBody);
+
   if(res.ok){
-    resultEl.style.background='#dcfce7';resultEl.style.color='#15803d';resultEl.style.border='0.5px solid #86efac';
-    resultEl.textContent='✓ Test SMS sent successfully! Check your phone.';
-    showToast('✓ SMS sent! Check your phone.',4000);
-  }else{
-    const errMsg=res.data?.message||res.data?.error||res.error||'Unknown error';
-    resultEl.style.background='#fee2e2';resultEl.style.color='#991b1b';resultEl.style.border='0.5px solid #fca5a5';
-    resultEl.textContent='✗ SMS failed: '+errMsg+'\n\nMake sure you uploaded the api/send-sms.js file to GitHub and Vercel has deployed it.';
-    console.error('SMS error:',res);
+    setResult(true,'✓ Test SMS sent successfully!\nCheck your phone — you should have a text from your Twilio number.\n\nThe text contains a WhatsApp link — tap it to see exactly what birthday reminders look like.');
+    showToast('✓ SMS sent! Check your phone.',5000);
+  } else if(res.networkError){
+    setResult(false,'✗ Network error: '+res.error+'\n\nThis usually means the Vercel function file is missing.\nCheck that api/send-sms.js is in your GitHub repo.');
+  } else {
+    const errMsg=res.data?.error||res.data?.message||'Unknown error';
+    const twilioCode=res.data?.twilioCode||res.data?.code||'';
+    const moreInfo=res.data?.moreInfo||'';
+    let hint='';
+    if(twilioCode===21608)hint='\n\nFix: Your Twilio trial account can only send to verified numbers.\nGo to console.twilio.com → Verified Caller IDs → Add your mobile number.';
+    else if(twilioCode===21211)hint='\n\nFix: Invalid "To" number. Make sure it includes country code e.g. +17185550001';
+    else if(twilioCode===21212)hint='\n\nFix: Invalid "From" number. Use your Twilio number exactly as shown in the console e.g. +12025550123';
+    else if(twilioCode===20003)hint='\n\nFix: Authentication failed. Double-check your Account SID and Auth Token — copy them fresh from console.twilio.com';
+    else if(res.status===400&&!twilioCode)hint='\n\nFix: Missing fields. Click Save & activate first, then try again.';
+    setResult(false,'✗ SMS failed (code '+twilioCode+'): '+errMsg+hint+(moreInfo?'\n\nMore info: '+moreInfo:''));
+    console.error('SMS test error:',res);
   }
 }
 
