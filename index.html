@@ -469,7 +469,12 @@ function setCloud(state,msg){
   else{dot.className='dot dot-gray';txt.style.color='#aaa';badge.textContent='⚪ Not synced';}
   txt.textContent=msg;
 }
-function saveLoc(){localStorage.setItem('bdays_v7',JSON.stringify(birthdays));localStorage.setItem('bday_groups',JSON.stringify(groups));}
+function saveLoc(){
+  localStorage.setItem('bdays_v7',JSON.stringify(birthdays));
+  localStorage.setItem('bday_groups',JSON.stringify(groups));
+  // Also keep a timestamped backup key so data is never lost
+  localStorage.setItem('bdays_backup',JSON.stringify({birthdays,groups,saved:new Date().toISOString()}));
+}
 function save(){saveLoc();cloudSave();}
 
 // ── Twilio via Vercel function ──
@@ -653,6 +658,43 @@ function addManual(){
 }
 function deleteBirthday(id){birthdays=birthdays.filter(b=>String(b.id)!==String(id));save();render();}
 
+function editBirthday(id){
+  const b=birthdays.find(b=>String(b.id)===String(id));if(!b)return;
+  // Open edit modal
+  const parts=b.name.split(' ');
+  document.getElementById('m-title').textContent='Edit staff member';
+  document.getElementById('m-img').style.display='none';
+  document.getElementById('m-body').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+      <div><label style="font-size:12px;color:#666;font-weight:500;display:block;margin-bottom:4px">First name</label>
+        <input type="text" id="ed-fname" value="${parts[0]||''}" style="width:100%;border:0.5px solid #d4c5a0;border-radius:8px;padding:8px 10px;font-size:14px;font-family:inherit;outline:none"/></div>
+      <div><label style="font-size:12px;color:#666;font-weight:500;display:block;margin-bottom:4px">Last name</label>
+        <input type="text" id="ed-lname" value="${parts.slice(1).join(' ')||''}" style="width:100%;border:0.5px solid #d4c5a0;border-radius:8px;padding:8px 10px;font-size:14px;font-family:inherit;outline:none"/></div>
+    </div>
+    <div style="margin-bottom:8px"><label style="font-size:12px;color:#666;font-weight:500;display:block;margin-bottom:4px">Birthday</label>
+      <input type="text" id="ed-date" value="${b.date||''}" placeholder="e.g. Apr 12" style="width:100%;border:0.5px solid #d4c5a0;border-radius:8px;padding:8px 10px;font-size:14px;font-family:inherit;outline:none"/></div>
+    <div style="margin-bottom:8px"><label style="font-size:12px;color:#666;font-weight:500;display:block;margin-bottom:4px">Phone</label>
+      <input type="tel" id="ed-phone" value="${b.phone||''}" style="width:100%;border:0.5px solid #d4c5a0;border-radius:8px;padding:8px 10px;font-size:14px;font-family:inherit;outline:none"/></div>
+    <div style="margin-bottom:12px"><label style="font-size:12px;color:#666;font-weight:500;display:block;margin-bottom:4px">Personal message</label>
+      <textarea id="ed-msg" rows="2" style="width:100%;border:0.5px solid #d4c5a0;border-radius:8px;padding:8px 10px;font-size:14px;font-family:inherit;outline:none;resize:vertical">${b.msg||''}</textarea></div>
+    <button class="send-both" onclick="saveEdit('${id}')">✓ Save changes</button>`;
+  document.getElementById('modal').classList.add('open');
+}
+
+function saveEdit(id){
+  const fname=document.getElementById('ed-fname').value.trim();
+  const lname=document.getElementById('ed-lname').value.trim();
+  const date=document.getElementById('ed-date').value.trim();
+  const phone=document.getElementById('ed-phone').value.trim();
+  const msg=document.getElementById('ed-msg').value.trim();
+  if(!fname||!date||!phone){showToast('First name, birthday and phone are required.');return;}
+  const idx=birthdays.findIndex(b=>String(b.id)===String(id));
+  if(idx>-1){
+    birthdays[idx]={...birthdays[idx],name:(fname+' '+lname).trim(),date,phone,msg:msg||birthdays[idx].msg};
+    save();render();closeModal();showToast('✓ Saved!');
+  }
+}
+
 // ── Send modal ──
 function openModal(id,phone,fn,restMsg,groupId,restGMsg){
   const pMsg=buildMsg(fn,restMsg);const cleaned=phone.replace(/[\s\-\(\)]/g,'').replace('+','');
@@ -752,6 +794,7 @@ function render(){
       <div class="iact">
         ${badge}
         <button class="btn-wa" style="${sent?'background:#888;':''}" onclick="openModal('${sid}',\`${pe}\`,\`${fe}\`,\`${me}\`,\`${gid}\`,\`${ge}\`)">${waIcon} ${sent?'Sent':'Send'}</button>
+        <button class="btn-del" style="background:transparent;border:0.5px solid #d4c5a0;border-radius:8px;padding:5px 8px;font-size:12px;cursor:pointer;color:#1a2a8a;font-family:inherit" onclick="editBirthday('${sid}')">✏️</button>
         <button class="btn-del" onclick="deleteBirthday('${sid}')">✕</button>
       </div>
     </div>`;
