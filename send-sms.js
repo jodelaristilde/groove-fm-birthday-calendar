@@ -1,9 +1,11 @@
-export default async function handler(req, res) {
-  // Allow CORS and OPTIONS preflight
+module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  if (req.method === 'OPTIONS') return res.status(200).end();
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -12,12 +14,12 @@ export default async function handler(req, res) {
   const { to, from, body, accountSid, authToken } = req.body || {};
 
   if (!to || !from || !body || !accountSid || !authToken) {
-    return res.status(400).json({ error: 'Missing required fields: to, from, body, accountSid, authToken' });
+    return res.status(400).json({ error: 'Missing required fields' });
   }
 
   try {
-    const credentials = Buffer.from(`${accountSid}:${authToken}`).toString('base64');
-    const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
+    const credentials = Buffer.from(accountSid + ':' + authToken).toString('base64');
+    const twilioUrl = 'https://api.twilio.com/2010-04-01/Accounts/' + accountSid + '/Messages.json';
 
     const params = new URLSearchParams();
     params.append('To', to);
@@ -27,7 +29,7 @@ export default async function handler(req, res) {
     const response = await fetch(twilioUrl, {
       method: 'POST',
       headers: {
-        'Authorization': `Basic ${credentials}`,
+        'Authorization': 'Basic ' + credentials,
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: params.toString(),
@@ -47,4 +49,4 @@ export default async function handler(req, res) {
   } catch (err) {
     return res.status(500).json({ error: err.message || 'Internal server error' });
   }
-}
+};
