@@ -369,8 +369,13 @@ textarea{resize:vertical;min-height:60px}
 <script>
 const COLORS=['av-purple','av-teal','av-coral','av-pink','av-blue'];
 const JSONBIN='https://api.jsonbin.io/v3';
-let BIN_ID=localStorage.getItem('jb_bin_id')||'';
-let JB_KEY=localStorage.getItem('jb_key')||'';
+// Hardcoded credentials — auto-connect on every device
+const DEFAULT_BIN='69dcc2d636566621a8aa1029';
+const DEFAULT_KEY='$2a$10$6GOKndL/eaiNRujw7NZGb.LlOmvOioaEwo0NSpXYNUrzSp1Ethw36';
+if(!localStorage.getItem('jb_bin_id'))localStorage.setItem('jb_bin_id',DEFAULT_BIN);
+if(!localStorage.getItem('jb_key'))localStorage.setItem('jb_key',DEFAULT_KEY);
+let BIN_ID=localStorage.getItem('jb_bin_id')||DEFAULT_BIN;
+let JB_KEY=localStorage.getItem('jb_key')||DEFAULT_KEY;
 let birthdays=JSON.parse(localStorage.getItem('bdays_v7')||'[]');
 let groups=JSON.parse(localStorage.getItem('bday_groups')||'[]');
 let cardUrl=localStorage.getItem('bday_card')||null;
@@ -906,7 +911,9 @@ async function shareCard() {
 window.addEventListener('load',()=>{
   const saved=JSON.parse(localStorage.getItem('twilio_cfg')||'{}');
   if(saved.sid){document.getElementById('tw-sid').value=saved.sid;document.getElementById('tw-token').value=saved.token||'';document.getElementById('tw-from').value=saved.from||'';document.getElementById('tw-to').value=saved.to||'';document.getElementById('tw-to2').value=saved.to2||'';updateCfgStatus(true);document.querySelectorAll('.wstep').forEach(s=>s.classList.add('done'));goWStep(4);}
-  if(JB_KEY){document.getElementById('jb-key').value=JB_KEY;if(BIN_ID){setCloud('syncing','Loading...');cloudLoad();}else connectCloud();}
+  // Auto-connect with hardcoded credentials
+  document.getElementById('jb-key').value=JB_KEY;
+  if(BIN_ID&&JB_KEY){setCloud('syncing','Loading your staff data...');cloudLoad();}else if(JB_KEY){connectCloud();}
   if(cardUrl)showCardPrev();
   updateNotifBtn();renderGroups();updateGroupSelect();renderHolGrid();render();startSched();
   const todays=birthdays.filter(b=>isToday(b.date));
