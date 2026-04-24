@@ -254,6 +254,10 @@ textarea{resize:vertical;min-height:60px}
 
   <!-- ADD STAFF -->
   <div class="main-title">Staff birthdays</div>
+  <div style="background:#fff7ed;border:0.5px solid #C9A84C;border-radius:10px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+    <span style="font-size:12px;color:#92400e;">🧪 <strong>Test 7AM reminder</strong> — sends real SMS + notification now</span>
+    <button class="btn btn-dark" style="font-size:12px;padding:6px 16px;background:#0a1560;" onclick="testNow()">▶ Test Now</button>
+  </div>
   <div class="add-tabs">
     <button class="add-tab active" onclick="switchAddTab('manual')">+ Add staff</button>
     <button class="add-tab" onclick="switchAddTab('import')">Import Excel</button>
@@ -595,6 +599,29 @@ function checkAndFire(){
     if(cfg.to2)sendSMS(cfg.to2,sms);
   });
   if(todays.length)showToast('🎂 '+todays.length+' birthday reminder'+(todays.length>1?'s':'')+' sent!');
+}
+
+
+function testNow(){
+  if(!birthdays.length){showToast('Add at least one staff member first!');return;}
+  const todays=birthdays.filter(b=>isToday(b.date));
+  const list = todays.length ? todays : [birthdays[0]]; // use first person if no birthday today
+  const cfg=getTwilioCfg();
+  list.forEach(b=>{
+    const fn=b.name.split(' ')[0];
+    const cleaned=(b.phone||'').replace(/[\s\-\(\)]/g,'').replace('+','');
+    const waLink='https://wa.me/'+cleaned+'?text='+encodeURIComponent(buildMsg(fn,b.msg||''));
+    const grp=b.groupId?getGroup(b.groupId):null;
+    // Browser notification
+    sendBrowserNotif('🎂 Happy Birthday '+b.name+'! Tap to send WhatsApp 👇','Tap this notification to open WhatsApp — message is pre-filled, just hit Send!',waLink);
+    // SMS to your number
+    let sms='🎂 Today is '+b.name+"'s birthday!\n\n👤 Personal WhatsApp → tap to open & hit Send:\n"+waLink;
+    if(grp){sms+='\n\n👥 Group \"'+grp.name+'\":\n'+grp.link+'?text='+encodeURIComponent(buildGroupMsg(fn,b.gmsg||''));}
+    sms+='\n\n— Groove FM Birthday Calendar';
+    if(cfg.to)sendSMS(cfg.to,sms);
+    if(cfg.to2)sendSMS(cfg.to2,sms);
+  });
+  showToast('✅ Test sent to '+cfg.to+'! Check your phone for the SMS.',6000);
 }
 
 // ── Birthday card ──
