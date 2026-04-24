@@ -369,13 +369,13 @@ textarea{resize:vertical;min-height:60px}
 <script>
 const COLORS=['av-purple','av-teal','av-coral','av-pink','av-blue'];
 const JSONBIN='https://api.jsonbin.io/v3';
-// Hardcoded credentials — auto-connect on every device
+// Force correct credentials on every device — always overwrite
 const DEFAULT_BIN='69dcc2d636566621a8aa1029';
 const DEFAULT_KEY='$2a$10$6GOKndL/eaiNRujw7NZGb.LlOmvOioaEwo0NSpXYNUrzSp1Ethw36';
-if(!localStorage.getItem('jb_bin_id'))localStorage.setItem('jb_bin_id',DEFAULT_BIN);
-if(!localStorage.getItem('jb_key'))localStorage.setItem('jb_key',DEFAULT_KEY);
-let BIN_ID=localStorage.getItem('jb_bin_id')||DEFAULT_BIN;
-let JB_KEY=localStorage.getItem('jb_key')||DEFAULT_KEY;
+localStorage.setItem('jb_bin_id',DEFAULT_BIN);
+localStorage.setItem('jb_key',DEFAULT_KEY);
+let BIN_ID=DEFAULT_BIN;
+let JB_KEY=DEFAULT_KEY;
 let birthdays=JSON.parse(localStorage.getItem('bdays_v7')||'[]');
 let groups=JSON.parse(localStorage.getItem('bday_groups')||'[]');
 let cardUrl=localStorage.getItem('bday_card')||null;
