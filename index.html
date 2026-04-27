@@ -379,17 +379,70 @@ let notifEnabled=localStorage.getItem('notif_enabled')==='true';
 
 const HCARDS={"newyear": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMjIwIiB2aWV3Qm94PSIwIDAgNDAwIDIyMCI+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdHlsZT0ic3RvcC1jb2xvcjojMGExNTYwIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdHlsZT0ic3RvcC1jb2xvcjojMWEyYThhIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIyMjAiIGZpbGw9InVybCgjZykiIHJ4PSIxNiIvPgogIDx0ZXh0IHg9IjIwMCIgeT0iMTA1IiBmb250LXNpemU9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIj7wn46GPC90ZXh0PgogIDx0ZXh0IHg9IjIwMCIgeT0iMTcwIiBmb250LXNpemU9IjIyIiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZiIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiPk5ldyBZZWFyPC90ZXh0PgogIDx0ZXh0IHg9IjIwMCIgeT0iMjAwIiBmb250LXNpemU9IjEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmIiBvcGFjaXR5PSIwLjgiIGZvbnQtZmFtaWx5PSJBcmlhbCxzYW5zLXNlcmlmIj5Hcm9vdmUgRk0gUmFkaW88L3RleHQ+Cjwvc3ZnPg==", "valentines": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMjIwIiB2aWV3Qm94PSIwIDAgNDAwIDIyMCI+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdHlsZT0ic3RvcC1jb2xvcjojOEIwMDAwIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdHlsZT0ic3RvcC1jb2xvcjojY2MwMDQ0Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIyMjAiIGZpbGw9InVybCgjZykiIHJ4PSIxNiIvPgogIDx0ZXh0IHg9IjIwMCIgeT0iMTA1IiBmb250LXNpemU9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIj7inaTvuI88L3RleHQ+CiAgPHRleHQgeD0iMjAwIiB5PSIxNzAiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSJib2xkIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmIiBmb250LWZhbWlseT0iQXJpYWwsc2Fucy1zZXJpZiI+VmFsZW50aW5lJ3MgRGF5PC90ZXh0PgogIDx0ZXh0IHg9IjIwMCIgeT0iMjAwIiBmb250LXNpemU9IjEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmIiBvcGFjaXR5PSIwLjgiIGZvbnQtZmFtaWx5PSJBcmlhbCxzYW5zLXNlcmlmIj5Hcm9vdmUgRk0gUmFkaW88L3RleHQ+Cjwvc3ZnPg==", "easter": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMjIwIiB2aWV3Qm94PSIwIDAgNDAwIDIyMCI+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdHlsZT0ic3RvcC1jb2xvcjojN0I2OEVFIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdHlsZT0ic3RvcC1jb2xvcjojZmY2OWI0Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIyMjAiIGZpbGw9InVybCgjZykiIHJ4PSIxNiIvPgogIDx0ZXh0IHg9IjIwMCIgeT0iMTA1IiBmb250LXNpemU9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIj7wn5CjPC90ZXh0PgogIDx0ZXh0IHg9IjIwMCIgeT0iMTcwIiBmb250LXNpemU9IjIyIiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZiIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiPkVhc3RlcjwvdGV4dD4KICA8dGV4dCB4PSIyMDAiIHk9IjIwMCIgZm9udC1zaXplPSIxMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iMC44IiBmb250LWZhbWlseT0iQXJpYWwsc2Fucy1zZXJpZiI+R3Jvb3ZlIEZNIFJhZGlvPC90ZXh0Pgo8L3N2Zz4=", "mothersday": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMjIwIiB2aWV3Qm94PSIwIDAgNDAwIDIyMCI+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdHlsZT0ic3RvcC1jb2xvcjojQzlBODRDIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdHlsZT0ic3RvcC1jb2xvcjojOEI2OTE0Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIyMjAiIGZpbGw9InVybCgjZykiIHJ4PSIxNiIvPgogIDx0ZXh0IHg9IjIwMCIgeT0iMTA1IiBmb250LXNpemU9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIj7wn5KQPC90ZXh0PgogIDx0ZXh0IHg9IjIwMCIgeT0iMTcwIiBmb250LXNpemU9IjIyIiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZiIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiPk1vdGhlcidzIERheTwvdGV4dD4KICA8dGV4dCB4PSIyMDAiIHk9IjIwMCIgZm9udC1zaXplPSIxMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iMC44IiBmb250LWZhbWlseT0iQXJpYWwsc2Fucy1zZXJpZiI+R3Jvb3ZlIEZNIFJhZGlvPC90ZXh0Pgo8L3N2Zz4=", "july4": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMjIwIiB2aWV3Qm94PSIwIDAgNDAwIDIyMCI+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdHlsZT0ic3RvcC1jb2xvcjojQjIyMjIyIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdHlsZT0ic3RvcC1jb2xvcjojMDAxZjhhIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIyMjAiIGZpbGw9InVybCgjZykiIHJ4PSIxNiIvPgogIDx0ZXh0IHg9IjIwMCIgeT0iMTA1IiBmb250LXNpemU9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIj7wn46HPC90ZXh0PgogIDx0ZXh0IHg9IjIwMCIgeT0iMTcwIiBmb250LXNpemU9IjIyIiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZiIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiPjR0aCBvZiBKdWx5PC90ZXh0PgogIDx0ZXh0IHg9IjIwMCIgeT0iMjAwIiBmb250LXNpemU9IjEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmIiBvcGFjaXR5PSIwLjgiIGZvbnQtZmFtaWx5PSJBcmlhbCxzYW5zLXNlcmlmIj5Hcm9vdmUgRk0gUmFkaW88L3RleHQ+Cjwvc3ZnPg==", "thanksgiving": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMjIwIiB2aWV3Qm94PSIwIDAgNDAwIDIyMCI+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdHlsZT0ic3RvcC1jb2xvcjojOEI0NTEzIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdHlsZT0ic3RvcC1jb2xvcjojQzlBODRDIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIyMjAiIGZpbGw9InVybCgjZykiIHJ4PSIxNiIvPgogIDx0ZXh0IHg9IjIwMCIgeT0iMTA1IiBmb250LXNpemU9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIj7wn6aDPC90ZXh0PgogIDx0ZXh0IHg9IjIwMCIgeT0iMTcwIiBmb250LXNpemU9IjIyIiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZiIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiPlRoYW5rc2dpdmluZzwvdGV4dD4KICA8dGV4dCB4PSIyMDAiIHk9IjIwMCIgZm9udC1zaXplPSIxMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iMC44IiBmb250LWZhbWlseT0iQXJpYWwsc2Fucy1zZXJpZiI+R3Jvb3ZlIEZNIFJhZGlvPC90ZXh0Pgo8L3N2Zz4=", "christmas": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMjIwIiB2aWV3Qm94PSIwIDAgNDAwIDIyMCI+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdHlsZT0ic3RvcC1jb2xvcjojMDA2NDAwIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdHlsZT0ic3RvcC1jb2xvcjojOEIwMDAwIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIyMjAiIGZpbGw9InVybCgjZykiIHJ4PSIxNiIvPgogIDx0ZXh0IHg9IjIwMCIgeT0iMTA1IiBmb250LXNpemU9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIj7wn46EPC90ZXh0PgogIDx0ZXh0IHg9IjIwMCIgeT0iMTcwIiBmb250LXNpemU9IjIyIiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZiIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiPkNocmlzdG1hczwvdGV4dD4KICA8dGV4dCB4PSIyMDAiIHk9IjIwMCIgZm9udC1zaXplPSIxMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iMC44IiBmb250LWZhbWlseT0iQXJpYWwsc2Fucy1zZXJpZiI+R3Jvb3ZlIEZNIFJhZGlvPC90ZXh0Pgo8L3N2Zz4=", "fathersday": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMjIwIiB2aWV3Qm94PSIwIDAgNDAwIDIyMCI+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdHlsZT0ic3RvcC1jb2xvcjojMWEyYThhIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdHlsZT0ic3RvcC1jb2xvcjojMGExNTYwIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIyMjAiIGZpbGw9InVybCgjZykiIHJ4PSIxNiIvPgogIDx0ZXh0IHg9IjIwMCIgeT0iMTA1IiBmb250LXNpemU9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIj7wn5GUPC90ZXh0PgogIDx0ZXh0IHg9IjIwMCIgeT0iMTcwIiBmb250LXNpemU9IjIyIiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZiIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiPkZhdGhlcidzIERheTwvdGV4dD4KICA8dGV4dCB4PSIyMDAiIHk9IjIwMCIgZm9udC1zaXplPSIxMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iMC44IiBmb250LWZhbWlseT0iQXJpYWwsc2Fucy1zZXJpZiI+R3Jvb3ZlIEZNIFJhZGlvPC90ZXh0Pgo8L3N2Zz4=", "memorial": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMjIwIiB2aWV3Qm94PSIwIDAgNDAwIDIyMCI+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdHlsZT0ic3RvcC1jb2xvcjojMWExYTJlIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdHlsZT0ic3RvcC1jb2xvcjojOEIwMDAwIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIyMjAiIGZpbGw9InVybCgjZykiIHJ4PSIxNiIvPgogIDx0ZXh0IHg9IjIwMCIgeT0iMTA1IiBmb250LXNpemU9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIj7wn46W77iPPC90ZXh0PgogIDx0ZXh0IHg9IjIwMCIgeT0iMTcwIiBmb250LXNpemU9IjIyIiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZiIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiPk1lbW9yaWFsIERheTwvdGV4dD4KICA8dGV4dCB4PSIyMDAiIHk9IjIwMCIgZm9udC1zaXplPSIxMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iMC44IiBmb250LWZhbWlseT0iQXJpYWwsc2Fucy1zZXJpZiI+R3Jvb3ZlIEZNIFJhZGlvPC90ZXh0Pgo8L3N2Zz4=", "haiti": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMjIwIiB2aWV3Qm94PSIwIDAgNDAwIDIyMCI+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdHlsZT0ic3RvcC1jb2xvcjojMDAzRjg3Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdHlsZT0ic3RvcC1jb2xvcjojRDIxMDM0Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIyMjAiIGZpbGw9InVybCgjZykiIHJ4PSIxNiIvPgogIDx0ZXh0IHg9IjIwMCIgeT0iMTA1IiBmb250LXNpemU9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIj7wn4et8J+HuTwvdGV4dD4KICA8dGV4dCB4PSIyMDAiIHk9IjE3MCIgZm9udC1zaXplPSIyMiIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmYiIGZvbnQtZmFtaWx5PSJBcmlhbCxzYW5zLXNlcmlmIj5IYWl0aWFuIEZsYWcgRGF5PC90ZXh0PgogIDx0ZXh0IHg9IjIwMCIgeT0iMjAwIiBmb250LXNpemU9IjEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmIiBvcGFjaXR5PSIwLjgiIGZvbnQtZmFtaWx5PSJBcmlhbCxzYW5zLXNlcmlmIj5Hcm9vdmUgRk0gUmFkaW88L3RleHQ+Cjwvc3ZnPg=="};
 const HOLIDAYS=[
-  {id:'newyear',    icon:'🎆',name:'New Year',          msg:"Happy New Year! 🎆 Wishing you health, happiness and success in the year ahead. It's a pleasure having you on the Groove FM Radio team!"},
-  {id:'valentines', icon:'❤️', name:"Valentine's Day",   msg:"Happy Valentine's Day! ❤️ Sending love and appreciation your way. We're so glad you're part of the Groove FM Radio family!"},
-  {id:'easter',     icon:'🐣',name:'Easter',             msg:'Happy Easter! 🐣 Wishing you a joyful and blessed day with your loved ones. Thank you for being part of the Groove FM Radio family!'},
-  {id:'mothersday', icon:'💐',name:"Mother's Day",       msg:"Happy Mother's Day! 💐 To all the amazing mums on our team — we see you, we appreciate you, and we celebrate you today!"},
-  {id:'july4',      icon:'🎇',name:'4th of July',        msg:'Happy 4th of July! 🎇 Wishing you a fun-filled celebration. Thank you for being part of the Groove FM Radio team!'},
-  {id:'thanksgiving',icon:'🦃',name:'Thanksgiving',      msg:'Happy Thanksgiving! 🦃 We are truly grateful to have you on our team. Wishing you a warm celebration with family and friends!'},
-  {id:'christmas',  icon:'🎄',name:'Christmas',          msg:'Merry Christmas! 🎄 Wishing you and your family a wonderful holiday filled with joy and love. Thank you for everything you do at Groove FM Radio!'},
-  {id:'fathersday', icon:'👔',name:"Father's Day",       msg:"Happy Father's Day! 👔 To all the wonderful dads at Groove FM Radio — thank you for everything. Have a fantastic day!"},
-  {id:'memorial',   icon:'🎖️',name:'Memorial Day',        msg:'Happy Memorial Day! 🎖️ We honor and remember all who have served and sacrificed for our freedom. Wishing you a meaningful day. 🇺🇸'},
-  {id:'haiti',      icon:'🇭🇹',name:'Haitian Flag Day',    msg:'Joyeuse Fête du Drapeau! 🇭🇹 Happy Haitian Flag Day! We celebrate the rich culture, strength and pride of Haiti. Vive Haïti! 🎉'},
+  {id:'newyear',    icon:'🎆',name:'New Year',          month:1,  day:1,   floating:false, msg:"Happy New Year! 🎆 Wishing you health, happiness and success in the year ahead. It's a pleasure having you on the Groove FM Radio team!"},
+  {id:'valentines', icon:'❤️', name:"Valentine's Day",   month:2,  day:14,  floating:false, msg:"Happy Valentine's Day! ❤️ Sending love and appreciation your way. We're so glad you're part of the Groove FM Radio family!"},
+  {id:'easter',     icon:'🐣',name:'Easter',             month:0,  day:0,   floating:'easter', msg:'Happy Easter! 🐣 Wishing you a joyful and blessed day with your loved ones. Thank you for being part of the Groove FM Radio family!'},
+  {id:'mothersday', icon:'💐',name:"Mother's Day",       month:0,  day:0,   floating:'mothers', msg:"Happy Mother's Day! 💐 To all the amazing mums on our team — we see you, we appreciate you, and we celebrate you today!"},
+  {id:'memorial',   icon:'🎖️',name:'Memorial Day',        month:0,  day:0,   floating:'memorial', msg:'Happy Memorial Day! 🎖️ We honor and remember all who have served and sacrificed for our freedom. Wishing you a meaningful day. 🇺🇸'},
+  {id:'haiti',      icon:'🇭🇹',name:'Haitian Flag Day',   month:5,  day:18,  floating:false, msg:'Joyeuse Fête du Drapeau! 🇭🇹 Happy Haitian Flag Day! We celebrate the rich culture, strength and pride of Haiti. Vive Haïti! 🎉'},
+  {id:'july4',      icon:'🎇',name:'4th of July',         month:7,  day:4,   floating:false, msg:'Happy 4th of July! 🎇 Wishing you a fun-filled celebration. Thank you for being part of the Groove FM Radio team!'},
+  {id:'thanksgiving',icon:'🦃',name:'Thanksgiving',       month:0,  day:0,   floating:'thanksgiving', msg:'Happy Thanksgiving! 🦃 We are truly grateful to have you on our team. Wishing you a warm celebration with family and friends!'},
+  {id:'christmas',  icon:'🎄',name:'Christmas',           month:12, day:25,  floating:false, msg:'Merry Christmas! 🎄 Wishing you and your family a wonderful holiday filled with joy and love. Thank you for everything you do at Groove FM Radio!'},
+  {id:'fathersday', icon:'👔',name:"Father's Day",        month:0,  day:0,   floating:'fathers', msg:"Happy Father's Day! 👔 To all the wonderful dads at Groove FM Radio — thank you for everything. Have a fantastic day!"},
 ];
+
+// ── Floating holiday calculators ──
+function getEasterDate(year){
+  // Anonymous Gregorian algorithm
+  const a=year%19,b=Math.floor(year/100),c=year%100;
+  const d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25);
+  const g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30;
+  const i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7;
+  const m=Math.floor((a+11*h+22*l)/451);
+  const month=Math.floor((h+l-7*m+114)/31);
+  const day=((h+l-7*m+114)%31)+1;
+  return{m:month,d:day};
+}
+function nthWeekday(year,month,weekday,n){
+  // nth occurrence of weekday (0=Sun) in month (1-12)
+  let count=0;
+  for(let d=1;d<=31;d++){
+    const dt=new Date(year,month-1,d);
+    if(dt.getMonth()!==month-1)break;
+    if(dt.getDay()===weekday){count++;if(count===n)return{m:month,d};}
+  }
+  return{m:month,d:1};
+}
+function lastWeekday(year,month,weekday){
+  // last occurrence of weekday in month
+  let last=1;
+  for(let d=1;d<=31;d++){
+    const dt=new Date(year,month-1,d);
+    if(dt.getMonth()!==month-1)break;
+    if(dt.getDay()===weekday)last=d;
+  }
+  return{m:month,d:last};
+}
+function getHolidayDate(h,year){
+  if(!h.floating)return{m:h.month,d:h.day};
+  if(h.floating==='easter')return getEasterDate(year);
+  if(h.floating==='mothers')return nthWeekday(year,5,0,2);   // 2nd Sunday May
+  if(h.floating==='fathers')return nthWeekday(year,6,0,3);   // 3rd Sunday June
+  if(h.floating==='memorial')return lastWeekday(year,5,1);   // Last Monday May
+  if(h.floating==='thanksgiving')return nthWeekday(year,11,4,4); // 4th Thursday Nov
+  return{m:h.month,d:h.day};
+}
+function isHolidayToday(h){
+  const now=new Date();
+  const hd=getHolidayDate(h,now.getFullYear());
+  return hd.m===now.getMonth()+1&&hd.d===now.getDate();
+}
+function holidayDateStr(h){
+  const now=new Date();
+  const hd=getHolidayDate(h,now.getFullYear());
+  if(!hd.m)return'Date varies';
+  return new Date(now.getFullYear(),hd.m-1,hd.d).toLocaleDateString('en-US',{month:'long',day:'numeric'});
+}
 
 // ── Sent tracking ──
 function sentKey(id){const n=new Date();return String(id)+'_'+n.getFullYear()+'_'+(n.getMonth()+1)+'_'+n.getDate();}
@@ -579,24 +632,33 @@ function checkAndFire(){
   const key=now.getFullYear()+'-'+(now.getMonth()+1)+'-'+now.getDate();
   smsSentToday=JSON.parse(localStorage.getItem('sms_sent_today')||'{}');
   if(smsSentToday[key])return;
-  const todays=birthdays.filter(b=>isToday(b.date));if(!todays.length)return;
+  const todays=birthdays.filter(b=>isToday(b.date));
+  const todaysHols=HOLIDAYS.filter(h=>isHolidayToday(h));
+  if(!todays.length&&!todaysHols.length)return;
   smsSentToday[key]=true;localStorage.setItem('sms_sent_today',JSON.stringify(smsSentToday));
   const cfg=getTwilioCfg();
+  // Birthday reminders
   todays.forEach(b=>{
     const fn=b.name.split(' ')[0];
     const cleaned=(b.phone||'').replace(/[\s\-\(\)]/g,'').replace('+','');
     const waLink='https://wa.me/'+cleaned+'?text='+encodeURIComponent(buildMsg(fn,b.msg||''));
     const grp=b.groupId?getGroup(b.groupId):null;
-    // Browser notification
     sendBrowserNotif('🎂 Birthday today!','Today is '+b.name+"'s birthday! Tap to open the calendar.");
-    // SMS
     let sms='🎂 Today is '+b.name+"'s birthday!\n\n👤 Personal WhatsApp → tap & hit Send:\n"+waLink;
     if(grp){sms+='\n\n👥 Group "'+grp.name+'":\n'+grp.link+'?text='+encodeURIComponent(buildGroupMsg(fn,b.gmsg||''));}
     sms+='\n\n— Groove FM Birthday Calendar';
     if(cfg.to)sendSMS(cfg.to,sms);
     if(cfg.to2)sendSMS(cfg.to2,sms);
   });
-  if(todays.length)showToast('🎂 '+todays.length+' birthday reminder'+(todays.length>1?'s':'')+' sent!');
+  // Holiday reminders — alert manager to send cards
+  todaysHols.forEach(h=>{
+    sendBrowserNotif('🎉 '+h.name+' today!','Tap to send holiday cards to your staff on Groove FM Calendar.');
+    const sms='🎉 Today is '+h.name+'!\n\nOpen your calendar to send holiday cards to all your staff:\ngroovecalendar.vercel.app\n\n— Groove FM Birthday Calendar';
+    if(cfg.to)sendSMS(cfg.to,sms);
+    if(cfg.to2)sendSMS(cfg.to2,sms);
+  });
+  const total=todays.length+todaysHols.length;
+  if(total)showToast('🎉 '+total+' reminder'+(total>1?'s':'')+' sent!');
 }
 
 // ── Birthday card ──
@@ -729,7 +791,7 @@ function confirmImport(){importedRows.forEach(r=>pushEntry({name:r.name,date:r.d
 
 // ── Holiday broadcast ──
 let selHol=null,holCardUrl=null,holIdx=0;
-function renderHolGrid(){const g=document.getElementById('hol-grid');if(!g)return;g.innerHTML=HOLIDAYS.map(h=>`<div class="hol-card${selHol&&selHol.id===h.id?' selected':''}" onclick="selectHol('${h.id}')"><img src="${HCARDS[h.id]||''}" alt="${h.name}"/><div class="hol-label">${h.icon} ${h.name}</div></div>`).join('');}
+function renderHolGrid(){const g=document.getElementById('hol-grid');if(!g)return;g.innerHTML=HOLIDAYS.map(h=>`<div class="hol-card${selHol&&selHol.id===h.id?' selected':''}" onclick="selectHol('${h.id}')"><img src="${HCARDS[h.id]||''}" alt="${h.name}"/><div class="hol-label">${h.icon} ${h.name}<br><span style="font-size:10px;color:#888;font-weight:400">${holidayDateStr(h)}</span></div></div>`).join('');}
 function selectHol(id){
   selHol=HOLIDAYS.find(h=>h.id===id);if(!selHol)return;
   document.getElementById('h-icon').textContent=selHol.icon;document.getElementById('h-name').textContent=selHol.name;
