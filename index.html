@@ -172,10 +172,11 @@ textarea{resize:vertical;min-height:60px}
 
   <div class="sc blue-l" style="margin-top:1rem">
     <h3>☁️ Cloud sync — access from any device</h3>
-    <p>Enter your JSONbin.io API key once. Staff, Twilio credentials and groups sync across all your devices automatically.</p>
+    <p>Enter your JSONbin.io <strong>Master Key</strong> (X-MASTER-KEY) once. Staff, Twilio credentials and groups sync across all your devices automatically.</p>
     <div class="status-row"><div class="dot dot-gray" id="cloud-dot"></div><span id="cloud-txt" style="color:#aaa;font-size:13px">Not connected</span></div>
+    <div id="cloud-debug" style="display:none;margin-bottom:8px;padding:9px 12px;border-radius:8px;font-size:12px;white-space:pre-wrap;line-height:1.6"></div>
     <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end;margin-bottom:8px">
-      <div class="fg"><label>JSONbin.io API Key</label><input type="password" id="jb-key" placeholder="$2a$10$..."/><span class="hint">Free at <a href="https://jsonbin.io" target="_blank" style="color:#1a2a8a">jsonbin.io</a> → sign up → API Keys → Create Access Key</span></div>
+      <div class="fg"><label>JSONbin.io Master Key (X-MASTER-KEY)</label><input type="password" id="jb-key" placeholder="$2a$10$..."/><span class="hint">Go to <a href="https://jsonbin.io" target="_blank" style="color:#1a2a8a">jsonbin.io</a> → profile → API Keys → copy the <strong>X-MASTER-KEY</strong> (the top key)</span></div>
       <button class="btn btn-dark" onclick="connectCloud()">Connect</button>
     </div>
     <div class="step-box" style="margin-bottom:0"><h4>Get your free API key (2 min)</h4>
@@ -476,20 +477,70 @@ function sendBrowserNotif(title,body){
 }
 
 // ── Cloud sync ──
+function showCloudDebug(ok,msg){
+  const el=document.getElementById('cloud-debug');
+  if(!el)return;
+  el.style.display='block';
+  el.style.background=ok?'#dcfce7':'#fee2e2';
+  el.style.color=ok?'#15803d':'#991b1b';
+  el.style.border='0.5px solid '+(ok?'#86efac':'#fca5a5');
+  el.textContent=msg;
+}
+
 async function connectCloud(){
   const key=document.getElementById('jb-key').value.trim();
-  if(!key){showToast('Please enter your JSONbin API key.');return;}
-  JB_KEY=key;localStorage.setItem('jb_key',key);setCloud('syncing','Connecting...');
-  if(BIN_ID){await cloudLoad();}else{await cloudCreate();}
+  if(!key){showToast('Please enter your JSONbin Master Key.');return;}
+  JB_KEY=key;localStorage.setItem('jb_key',key);
+  setCloud('syncing','Connecting...');
+  showCloudDebug(true,'⏳ Connecting to JSONbin...');
+  await cloudFindOrCreate();
 }
+
+async function cloudFindOrCreate(){
+  try{
+    if(BIN_ID){const ok=await cloudLoad();if(ok)return;}
+    await cloudCreate();
+  }catch(e){
+    showCloudDebug(false,'Network error: '+e.message+'
+
+Check your internet connection.');
+    setCloud('err','Network error');
+  }
+}
+
 async function cloudCreate(){
   try{
-    const r=await fetch(JSONBIN+'/b',{method:'POST',headers:{'Content-Type':'application/json','X-Master-Key':JB_KEY,'X-Bin-Name':'GrooveFMCalendar'},body:JSON.stringify({birthdays,groups,twilio:getTwilioCfg()})});
+    showCloudDebug(true,'⏳ Creating your cloud data bin...');
+    const r=await fetch(JSONBIN+'/b',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-Master-Key':JB_KEY,'X-Bin-Name':'GrooveFMCalendar','X-Bin-Private':'false'},
+      body:JSON.stringify({birthdays,groups,twilio:getTwilioCfg()})
+    });
     const d=await r.json();
-    if(d.metadata?.id){BIN_ID=d.metadata.id;localStorage.setItem('jb_bin_id',BIN_ID);setCloud('ok','Connected & saved ✓');showToast('☁️ Cloud connected!',4000);}
-    else{setCloud('err','Check API key');showToast('Connection failed — check API key.');}
-  }catch(e){setCloud('err','Error');showToast('Connection error.');}
+    console.log('JSONbin create response:',d);
+    if(d.metadata?.id){
+      BIN_ID=d.metadata.id;
+      localStorage.setItem('jb_bin_id',BIN_ID);
+      setCloud('ok','Connected & saved ✓');
+      showCloudDebug(true,'✓ Connected! Your data syncs across all devices now.');
+      showToast('☁️ Cloud connected!',4000);
+    }else{
+      const errMsg=d.message||d.error||JSON.stringify(d);
+      setCloud('err','Failed');
+      showCloudDebug(false,'JSONbin error: '+errMsg+'
+
+Fix: Make sure you are copying the X-MASTER-KEY (the TOP key on the API Keys page).
+
+It should start with: $2a$10$
+
+Do NOT use the X-ACCESS-KEY (the bottom one).');
+    }
+  }catch(e){
+    setCloud('err','Error');
+    showCloudDebug(false,'Error: '+e.message);
+  }
 }
+
 async function cloudLoad(){
   try{
     const r=await fetch(JSONBIN+'/b/'+BIN_ID+'/latest',{headers:{'X-Master-Key':JB_KEY}});
@@ -497,7 +548,8 @@ async function cloudLoad(){
     if(d.record){
       if(d.record.birthdays)birthdays=d.record.birthdays;
       if(d.record.groups)groups=d.record.groups;
-      if(d.record.twilio){const t=d.record.twilio;
+      if(d.record.twilio){
+        const t=d.record.twilio;
         if(t.sid)document.getElementById('tw-sid').value=t.sid;
         if(t.token)document.getElementById('tw-token').value=t.token;
         if(t.from)document.getElementById('tw-from').value=t.from;
@@ -505,17 +557,36 @@ async function cloudLoad(){
         if(t.to2)document.getElementById('tw-to2').value=t.to2||'';
         if(t.sid){updateCfgStatus(true);document.querySelectorAll('.wstep').forEach(s=>s.classList.add('done'));goWStep(4);}
       }
-      saveLoc();setCloud('ok','Synced ✓');showToast('☁️ Data loaded!',3000);
+      saveLoc();
+      setCloud('ok','Synced ✓ — '+birthdays.length+' staff loaded');
+      showCloudDebug(true,'✓ '+birthdays.length+' staff members loaded from cloud!');
+      showToast('☁️ Data loaded! '+birthdays.length+' staff members.',3000);
       render();renderGroups();updateGroupSelect();
-    }else{await cloudCreate();}
-  }catch(e){setCloud('err','Load error');showToast('Cloud load error.');}
+      return true;
+    }else{
+      showCloudDebug(false,'Bin not found, creating new one...');
+      return false;
+    }
+  }catch(e){
+    showCloudDebug(false,'Load error: '+e.message);
+    return false;
+  }
 }
+
 async function cloudSave(){
   if(!BIN_ID||!JB_KEY)return;
   try{
-    await fetch(JSONBIN+'/b/'+BIN_ID,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':JB_KEY},body:JSON.stringify({birthdays,groups,twilio:getTwilioCfg()})});
-    setCloud('ok','Synced ✓');
-  }catch(e){setCloud('err','Sync failed');}
+    const r=await fetch(JSONBIN+'/b/'+BIN_ID,{
+      method:'PUT',
+      headers:{'Content-Type':'application/json','X-Master-Key':JB_KEY},
+      body:JSON.stringify({birthdays,groups,twilio:getTwilioCfg()})
+    });
+    const d=await r.json();
+    if(r.ok)setCloud('ok','Synced ✓');
+    else{setCloud('err','Sync failed: '+(d.message||'check key'));console.error('cloudSave error:',d);}
+  }catch(e){
+    setCloud('err','Sync error: '+e.message);
+  }
 }
 function setCloud(state,msg){
   const dot=document.getElementById('cloud-dot');const txt=document.getElementById('cloud-txt');const badge=document.getElementById('sync-badge');
@@ -869,7 +940,7 @@ function render(){
 window.addEventListener('load',()=>{
   const saved=JSON.parse(localStorage.getItem('twilio_cfg')||'{}');
   if(saved.sid){document.getElementById('tw-sid').value=saved.sid;document.getElementById('tw-token').value=saved.token||'';document.getElementById('tw-from').value=saved.from||'';document.getElementById('tw-to').value=saved.to||'';document.getElementById('tw-to2').value=saved.to2||'';updateCfgStatus(true);document.querySelectorAll('.wstep').forEach(s=>s.classList.add('done'));goWStep(4);}
-  if(JB_KEY){document.getElementById('jb-key').value=JB_KEY;if(BIN_ID){setCloud('syncing','Loading...');cloudLoad();}else connectCloud();}
+  if(JB_KEY){document.getElementById('jb-key').value=JB_KEY;setCloud('syncing','Loading your data...');cloudFindOrCreate();}
   if(cardUrl)showCardPrev();
   updateNotifBtn();renderGroups();updateGroupSelect();renderHolGrid();render();startSched();
   const todays=birthdays.filter(b=>isToday(b.date));
