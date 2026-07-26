@@ -501,9 +501,7 @@ async function cloudFindOrCreate(){
     if(BIN_ID){const ok=await cloudLoad();if(ok)return;}
     await cloudCreate();
   }catch(e){
-    showCloudDebug(false,'Network error: '+e.message+'
-
-Check your internet connection.');
+    showCloudDebug(false,'Network error: '+e.message+' - Check your internet connection.');
     setCloud('err','Network error');
   }
 }
@@ -527,13 +525,7 @@ async function cloudCreate(){
     }else{
       const errMsg=d.message||d.error||JSON.stringify(d);
       setCloud('err','Failed');
-      showCloudDebug(false,'JSONbin error: '+errMsg+'
-
-Fix: Make sure you are copying the X-MASTER-KEY (the TOP key on the API Keys page).
-
-It should start with: $2a$10$
-
-Do NOT use the X-ACCESS-KEY (the bottom one).');
+      showCloudDebug(false,'JSONbin error: '+errMsg+' Fix: Make sure you are copying the X-MASTER-KEY (the TOP key on the API Keys page). It should start with: $2a$10$ — Do NOT use the X-ACCESS-KEY (the bottom one).');
     }
   }catch(e){
     setCloud('err','Error');
