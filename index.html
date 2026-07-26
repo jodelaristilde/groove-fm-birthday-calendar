@@ -538,8 +538,21 @@ async function cloudLoad(){
     const r=await fetch(JSONBIN+'/b/'+BIN_ID+'/latest',{headers:{'X-Master-Key':JB_KEY}});
     const d=await r.json();
     if(d.record){
-      if(d.record.birthdays)birthdays=d.record.birthdays;
-      if(d.record.groups)groups=d.record.groups;
+      const cloudBdays=d.record.birthdays||[];
+      const cloudGroups=d.record.groups||[];
+      // SAFETY GUARD: never silently wipe local data with an empty/smaller cloud copy.
+      // If cloud has fewer staff than we already have locally, treat local as the
+      // source of truth and push it UP to the cloud instead of overwriting down.
+      if(cloudBdays.length<birthdays.length){
+        showCloudDebug(true,'⚠️ Cloud copy had fewer staff ('+cloudBdays.length+') than your local list ('+birthdays.length+'). Kept your local data and re-synced it up to the cloud to be safe.');
+        setCloud('ok','Kept local data ✓ — '+birthdays.length+' staff');
+        showToast('☁️ Local data protected — synced '+birthdays.length+' staff up to cloud',4000);
+        await cloudSave();
+        render();renderGroups();updateGroupSelect();
+        return true;
+      }
+      birthdays=cloudBdays;
+      groups=cloudGroups;
       if(d.record.twilio){
         const t=d.record.twilio;
         if(t.sid)document.getElementById('tw-sid').value=t.sid;
