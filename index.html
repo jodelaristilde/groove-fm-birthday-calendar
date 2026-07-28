@@ -152,19 +152,20 @@ textarea{resize:vertical;min-height:60px}
 .reminder-text strong{color:#0a1560}
 .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,#0a1560,#C9A84C);color:#fff;padding:10px 22px;border-radius:20px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap}
 .toast.show{opacity:1}
-.nb-bg{display:none;position:fixed;inset:0;background:rgba(10,21,96,.55);z-index:400;align-items:center;justify-content:center;padding:1rem}
+.nb-bg{display:none;position:fixed;inset:0;background:rgba(10,21,96,.55);z-index:400;align-items:center;justify-content:center;padding:0}
 .nb-bg.open{display:flex}
-.nb-box{background:linear-gradient(160deg,#0a1560,#1a2a8a 60%,#0a1560);border-radius:16px;padding:1.8rem 1.6rem;max-width:340px;width:92%;border:1px solid rgba(201,168,76,.4);text-align:center;position:relative;box-shadow:0 10px 40px rgba(0,0,0,.35)}
-.nb-close{position:absolute;top:10px;right:12px;background:transparent;border:none;color:rgba(255,255,255,.6);font-size:18px;cursor:pointer;line-height:1}
+.nb-box{background:linear-gradient(160deg,#0a1560,#1a2a8a 60%,#0a1560);border-radius:0;padding:2.4rem 1.6rem;max-width:none;width:100%;height:100%;border:none;text-align:center;position:relative;box-shadow:none;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.nb-close{position:absolute;top:16px;right:16px;background:transparent;border:none;color:rgba(255,255,255,.6);font-size:26px;cursor:pointer;line-height:1}
 .nb-close:hover{color:#fff}
-.nb-eyebrow{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#C9A84C;margin-bottom:8px}
-.nb-emoji{font-size:38px;margin-bottom:6px}
-.nb-name{font-size:30px;font-weight:700;color:#fff;margin-bottom:6px;line-height:1.2}
-.nb-date{font-size:13px;color:rgba(255,255,255,.7);margin-bottom:16px}
+.nb-inner{max-width:420px;width:100%}
+.nb-eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#C9A84C;margin-bottom:10px}
+.nb-emoji{font-size:52px;margin-bottom:8px}
+.nb-name{font-size:44px;font-weight:800;color:#fff;margin-bottom:8px;line-height:1.1;word-break:break-word}
+.nb-date{font-size:15px;color:rgba(255,255,255,.7);margin-bottom:20px}
 .nb-count{display:flex;justify-content:center;gap:10px;margin-bottom:6px}
-.nb-unit{background:rgba(255,255,255,.08);border:0.5px solid rgba(201,168,76,.35);border-radius:10px;padding:14px 26px;min-width:96px}
-.nb-num{font-size:34px;font-weight:700;color:#C9A84C;line-height:1}
-.nb-lbl{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-top:4px}
+.nb-unit{background:rgba(255,255,255,.08);border:0.5px solid rgba(201,168,76,.35);border-radius:12px;padding:18px 34px;min-width:120px}
+.nb-num{font-size:46px;font-weight:800;color:#C9A84C;line-height:1}
+.nb-lbl{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-top:5px}
 .nb-today{font-size:16px;color:#fff;font-weight:500;margin:4px 0 4px}
 .nb-dismiss{margin-top:16px;width:100%;padding:9px;border:0.5px solid rgba(201,168,76,.4);border-radius:8px;background:transparent;color:#C9A84C;font-size:13px;font-family:inherit;cursor:pointer}
 .nb-dismiss:hover{background:rgba(201,168,76,.12)}
@@ -396,17 +397,19 @@ textarea{resize:vertical;min-height:60px}
 <div class="nb-bg" id="nb-modal">
   <div class="nb-box">
     <button class="nb-close" onclick="closeNextBdayPopup()" aria-label="Close">✕</button>
-    <div class="nb-eyebrow" id="nb-eyebrow">Next up</div>
-    <div class="nb-emoji">🎂</div>
-    <div class="nb-name" id="nb-name"></div>
-    <div class="nb-date" id="nb-date"></div>
-    <div id="nb-count-wrap">
-      <div class="nb-count">
-        <div class="nb-unit"><div class="nb-num" id="nb-days">0</div><div class="nb-lbl">Days</div></div>
+    <div class="nb-inner">
+      <div class="nb-eyebrow" id="nb-eyebrow">Next up</div>
+      <div class="nb-emoji">🎂</div>
+      <div class="nb-name" id="nb-name"></div>
+      <div class="nb-date" id="nb-date"></div>
+      <div id="nb-count-wrap">
+        <div class="nb-count">
+          <div class="nb-unit"><div class="nb-num" id="nb-days">0</div><div class="nb-lbl">Days</div></div>
+        </div>
       </div>
+      <button class="nb-cal" onclick="addNextBdayToCalendar()">📅 Add to calendar</button>
+      <button class="nb-dismiss" onclick="closeNextBdayPopup()">Got it</button>
     </div>
-    <button class="nb-cal" onclick="addNextBdayToCalendar()">📅 Add to calendar</button>
-    <button class="nb-dismiss" onclick="closeNextBdayPopup()">Got it</button>
   </div>
 </div>
 
