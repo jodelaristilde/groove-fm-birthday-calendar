@@ -158,10 +158,10 @@ textarea{resize:vertical;min-height:60px}
 .nb-close{position:absolute;top:20px;right:20px;background:rgba(255,255,255,.1);border:none;color:#fff;font-size:28px;width:44px;height:44px;border-radius:50%;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center}
 .nb-close:hover{background:rgba(255,255,255,.2)}
 .nb-inner{max-width:560px;width:100%}
-.nb-eyebrow{font-size:clamp(14px,4.5vw,20px);letter-spacing:.08em;text-transform:uppercase;color:#C9A84C;margin-bottom:14px;font-weight:600}
+.nb-eyebrow{font-size:clamp(22px,7.5vw,34px);letter-spacing:.06em;text-transform:uppercase;color:#C9A84C;margin-bottom:16px;font-weight:700}
 .nb-emoji{font-size:clamp(60px,20vw,110px);margin-bottom:10px}
 .nb-name{font-size:clamp(48px,15vw,88px);font-weight:800;color:#fff;margin-bottom:14px;line-height:1.05;word-break:break-word}
-.nb-date{font-size:clamp(20px,6vw,32px);color:rgba(255,255,255,.85);margin-bottom:36px;font-weight:500}
+.nb-date{font-size:clamp(28px,9vw,46px);color:#fff;margin-bottom:36px;font-weight:600}
 .nb-count{display:flex;justify-content:center;gap:10px;margin-bottom:6px}
 .nb-unit{background:rgba(255,255,255,.08);border:1px solid rgba(201,168,76,.4);border-radius:18px;padding:clamp(22px,6vw,34px) clamp(34px,10vw,60px);min-width:140px}
 .nb-num{font-size:clamp(56px,20vw,110px);font-weight:800;color:#C9A84C;line-height:1}
@@ -888,8 +888,9 @@ function isToday(ds){const now=new Date();const p=parseDateStr(ds);if(!p)return 
 function daysUntil(ds){const now=new Date();now.setHours(0,0,0,0);const p=parseDateStr(ds);if(!p)return 999;const next=new Date(now.getFullYear(),p.m,p.d);if(next<now)next.setFullYear(now.getFullYear()+1);return Math.round((next-now)/86400000);}
 function fmtDate(ds){const p=parseDateStr(ds);if(!p)return ds||'—';return new Date(2000,p.m,p.d).toLocaleDateString('en-US',{day:'numeric',month:'long'});}
 let nbTimer=null;
+let nbAutoTimer=null;
 let nbCurrent=null; // {name, date, target}
-function closeNextBdayPopup(){document.getElementById('nb-modal').classList.remove('open');if(nbTimer){clearInterval(nbTimer);nbTimer=null;}}
+function closeNextBdayPopup(){document.getElementById('nb-modal').classList.remove('open');if(nbTimer){clearInterval(nbTimer);nbTimer=null;}if(nbAutoTimer){clearTimeout(nbAutoTimer);nbAutoTimer=null;}}
 function showNextBirthdayPopup(){
   if(!birthdays.length)return;
   const withDays=birthdays.map(b=>({b,days:daysUntil(b.date)})).sort((x,y)=>x.days-y.days);
@@ -914,6 +915,8 @@ function showNextBirthdayPopup(){
     countWrap.innerHTML='<div class="nb-count"><div class="nb-unit"><div class="nb-num" id="nb-days">'+soonest+'</div><div class="nb-lbl">Days</div></div></div>';
   }
   document.getElementById('nb-modal').classList.add('open');
+  if(nbAutoTimer)clearTimeout(nbAutoTimer);
+  nbAutoTimer=setTimeout(closeNextBdayPopup,5000);
 }
 function addNextBdayToCalendar(){
   if(!nbCurrent)return;
