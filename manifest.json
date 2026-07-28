@@ -1,9 +1,0 @@
-{
-  "name": "Staff Birthdays",
-  "short_name": "Birthdays",
-  "start_url": ".",
-  "display": "standalone",
-  "background_color": "#eef0fb",
-  "theme_color": "#0a1560",
-  "icons": []
-}
