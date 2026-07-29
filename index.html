@@ -119,8 +119,9 @@ textarea{resize:vertical;min-height:60px}
 .av-purple{background:#f0ead0;color:#0a1560}.av-teal{background:#dbeafe;color:#1a2a8a}
 .av-coral{background:#fef9e7;color:#B8860B}.av-pink{background:#f0ead0;color:#0a1560}.av-blue{background:#e8f4fd;color:#1a2a8a}
 .ii{flex:1;min-width:0}
-.in{font-size:18px;font-weight:700}
-.idate{font-size:14px;font-weight:400;color:#888;margin-left:8px;white-space:nowrap}
+.in{font-size:18px;font-weight:700;display:flex;align-items:baseline;flex-wrap:wrap;gap:6px;max-width:100%}
+.idate{font-size:18px;font-weight:700;color:#d32f2f;margin-left:0;white-space:normal;min-width:0}
+@media(max-width:420px){.in,.idate{font-size:clamp(13px,4.2vw,18px)}}
 .ibadges{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
 .ib{font-size:10px;padding:2px 6px;border-radius:8px}
 .ib-sms{color:#1a2a8a;background:#e8f4fd}.ib-grp{color:#0f766e;background:#e8f5f2}.ib-sent{background:#dcfce7;color:#15803d}.ib-notif{color:#B8860B;background:#fef9e7}
@@ -1186,7 +1187,7 @@ function render(){
       <div class="ii">
         <div class="in">${b.name} <span class="idate">${fmtDate(b.date)}</span></div>
         <div class="ibadges">
-          <span class="ib ib-sms">📱 7AM SMS</span>
+          <span class="ib ib-sms">📱 SMS</span>
           ${notifEnabled?'<span class="ib ib-notif">🔔 Alert</span>':''}
           ${grp?`<span class="ib ib-grp">👥 ${grp.name}</span>`:''}
           ${sent?'<span class="ib ib-sent">✓ Sent</span>':''}
