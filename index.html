@@ -109,8 +109,10 @@ textarea{resize:vertical;min-height:60px}
 .search-bar-lg .si{left:16px;font-size:17px}
 .si{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;pointer-events:none}
 #blist{margin:0 -1rem}
-.bitem{background:#fff;border:0;border-bottom:0.5px solid #ede8d0;border-radius:0;padding:1.1rem 1.25rem;margin-bottom:0;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px}
-.iname{justify-self:start;min-width:0}
+.bitem{background:#fff;border:0;border-bottom:0.5px solid #ede8d0;border-radius:0;padding:1.1rem 1.25rem;margin-bottom:0;display:grid;grid-template-columns:170px 1fr 100px;align-items:center;gap:14px}
+.bitem.admin-row{grid-template-columns:170px 1fr 270px}
+.iname{justify-self:start;min-width:0;overflow:hidden}
+.in{font-size:18px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .idate-col{justify-self:center;text-align:center;font-size:18px;font-weight:400;color:#d32f2f;white-space:nowrap}
 .iact{justify-self:end;display:flex;align-items:center;gap:5px}
 .bitem:nth-child(5n+1){border-left:5px solid #C9A84C}
@@ -121,8 +123,6 @@ textarea{resize:vertical;min-height:60px}
 .av{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:15px;flex-shrink:0}
 .av-purple{background:#f0ead0;color:#0a1560}.av-teal{background:#dbeafe;color:#1a2a8a}
 .av-coral{background:#fef9e7;color:#B8860B}.av-pink{background:#f0ead0;color:#0a1560}.av-blue{background:#e8f4fd;color:#1a2a8a}
-.iname{flex:1;min-width:0}
-.in{font-size:18px;font-weight:700;display:flex;align-items:baseline;flex-wrap:wrap;gap:6px;max-width:100%}
 @media(max-width:420px){.in,.idate-col{font-size:clamp(13px,4.2vw,18px)}}
 .ibadges{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
 .ib{font-size:10px;padding:2px 6px;border-radius:8px}
@@ -189,8 +189,10 @@ textarea{resize:vertical;min-height:60px}
 .nb-cal:hover{background:#ddbb5e}
 @media(max-width:520px){.add-row{grid-template-columns:1fr 1fr}.add-row>*:last-child{grid-column:1/-1}.hol-grid{grid-template-columns:repeat(4,1fr)}}
 @media(max-width:600px){
-  .bitem{grid-template-columns:auto 1fr auto;column-gap:8px;padding:1rem}
-  .idate-col{font-size:15px;white-space:nowrap}
+  .bitem{grid-template-columns:110px 1fr 80px;column-gap:8px;padding:1rem}
+  .bitem.admin-row{grid-template-columns:110px 1fr 220px}
+  .in{font-size:15px}
+  .idate-col{font-size:14px;white-space:nowrap}
   .iact{flex-wrap:wrap;justify-content:flex-end}
 }
 </style>
@@ -594,6 +596,12 @@ function lockAdmin(){
   isAdminUnlocked=false;sessionStorage.removeItem('admin_unlocked');
   document.getElementById('settings-drawer').classList.remove('open');
   showToast('🔒 Settings locked.');
+  render();
+}
+function autoLockAdmin(){
+  if(!isAdminUnlocked)return;
+  isAdminUnlocked=false;sessionStorage.removeItem('admin_unlocked');
+  document.getElementById('settings-drawer').classList.remove('open');
   render();
 }
 
@@ -1184,7 +1192,7 @@ function render(){
     const ge=(b.gmsg||'').replace(/\\/g,'\\\\').replace(/`/g,'\\`');
     const gid=(b.groupId||'').replace(/`/g,'\\`');
     const sent=hasAnySent(b.id);
-    return`<div class="bitem" style="${sent?'opacity:.7':''}">
+    return`<div class="bitem${isAdminUnlocked?' admin-row':''}" style="${sent?'opacity:.7':''}">
       <div class="iname">
         <div class="in">${b.name}</div>
         ${isAdminUnlocked?`<div class="ibadges">
@@ -1216,6 +1224,8 @@ window.addEventListener('load',()=>{
   setTimeout(showNextBirthdayPopup,400);
 });
 document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)autoLockAdmin();});
+window.addEventListener('pagehide',()=>{sessionStorage.removeItem('admin_unlocked');});
 </script>
 </body>
 </html>
