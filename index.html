@@ -116,7 +116,7 @@ textarea{resize:vertical;min-height:60px}
 .av-purple{background:#f0ead0;color:#0a1560}.av-teal{background:#dbeafe;color:#1a2a8a}
 .av-coral{background:#fef9e7;color:#B8860B}.av-pink{background:#f0ead0;color:#0a1560}.av-blue{background:#e8f4fd;color:#1a2a8a}
 .ii{flex:1;min-width:0}
-.in{font-size:17px;font-weight:600}
+.in{font-size:18px;font-weight:700}
 .idate{font-size:13px;color:#888;margin-top:2px}
 .ibadges{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
 .ib{font-size:10px;padding:2px 6px;border-radius:8px}
@@ -448,8 +448,12 @@ textarea{resize:vertical;min-height:60px}
 <script>
 const COLORS=['av-purple','av-teal','av-coral','av-pink','av-blue'];
 const JSONBIN='https://api.jsonbin.io/v3';
-let BIN_ID=localStorage.getItem('jb_bin_id')||'';
-let JB_KEY=localStorage.getItem('jb_key')||'';
+// Built-in cloud sync credentials — every device auto-connects to the same
+// shared data on load, no manual key/Bin-ID entry needed.
+const DEFAULT_JB_KEY='$2a$10$Ha4mJSdwIyLVzKR8vMjma.3qBb5VyNxIUkDDL3LeyckBbI4T4eb4G';
+const DEFAULT_BIN_ID='6a669014f5f4af5e29c52199';
+let BIN_ID=localStorage.getItem('jb_bin_id')||DEFAULT_BIN_ID;
+let JB_KEY=localStorage.getItem('jb_key')||DEFAULT_JB_KEY;
 let birthdays=JSON.parse(localStorage.getItem('bdays_v7')||'[]');
 let groups=JSON.parse(localStorage.getItem('bday_groups')||'[]');
 let cardUrl=localStorage.getItem('bday_card')||null;
