@@ -23,6 +23,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .sync-badge{font-size:11px;color:rgba(255,255,255,.65);padding:4px 8px;border-radius:8px;background:rgba(255,255,255,.1)}
 .gear-btn{background:rgba(255,255,255,.15);border:0.5px solid rgba(255,255,255,.3);border-radius:8px;padding:7px 12px;color:#C9A84C;font-size:13px;cursor:pointer;font-family:inherit}
 .gear-btn:hover{background:rgba(255,255,255,.25)}
+.gear-btn.locked{color:#ff6b6b;border-color:rgba(255,107,107,.5);background:rgba(255,107,107,.12)}
+.gear-btn.unlocked{color:#4ade80;border-color:rgba(74,222,128,.5);background:rgba(74,222,128,.12)}
 .notif-btn{background:rgba(255,255,255,.1);border:0.5px solid rgba(255,255,255,.2);border-radius:8px;padding:7px 10px;color:rgba(255,255,255,.8);font-size:13px;cursor:pointer;font-family:inherit}
 .notif-btn.on{color:#C9A84C;border-color:#C9A84C}
 .container{max-width:680px;margin:0 auto;padding:1rem}
@@ -113,7 +115,7 @@ textarea{resize:vertical;min-height:60px}
 .bitem.admin-row{grid-template-columns:170px 1fr 270px}
 .iname{justify-self:start;min-width:0;overflow:hidden}
 .in{font-size:18px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-.idate-col{justify-self:center;text-align:center;font-size:18px;font-weight:400;color:#d32f2f;white-space:nowrap}
+.idate-col{justify-self:start;text-align:left;font-size:18px;font-weight:400;color:#d32f2f;white-space:nowrap}
 .iact{justify-self:end;display:flex;align-items:center;gap:5px}
 .bitem:nth-child(5n+1){border-left:5px solid #C9A84C}
 .bitem:nth-child(5n+2){border-left:5px solid #0a1560}
@@ -205,7 +207,7 @@ textarea{resize:vertical;min-height:60px}
   <div class="hdr-right">
     <span class="sync-badge" id="sync-badge">⚪ Not synced</span>
     <button class="notif-btn" id="notif-btn" onclick="toggleNotifications()" title="Birthday notifications">🔔</button>
-    <button class="gear-btn" onclick="toggleSettings()">🔒 Admin</button>
+    <button class="gear-btn locked" id="admin-btn" onclick="toggleSettings()">🔒 Admin</button>
   </div>
 </div>
 
@@ -479,7 +481,7 @@ let cardName=localStorage.getItem('bday_card_name')||'';
 let importedRows=[];
 let schedInterval=null;
 let ADMIN_PIN=localStorage.getItem('admin_pin')||'';
-let isAdminUnlocked=sessionStorage.getItem('admin_unlocked')==='true';
+let isAdminUnlocked=false;
 let smsSentToday=JSON.parse(localStorage.getItem('sms_sent_today')||'{}');
 let sentLog=JSON.parse(localStorage.getItem('sent_log')||'{}');
 let notifEnabled=localStorage.getItem('notif_enabled')==='true';
@@ -561,6 +563,17 @@ function hasAnySent(id){const k=sentKey(id);return !!(sentLog[k]&&(sentLog[k].pe
 function showToast(m,d=3000){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),d);}
 
 // ── Settings drawer ──
+function updateAdminBtn(){
+  const btn=document.getElementById('admin-btn');
+  if(!btn)return;
+  if(isAdminUnlocked){
+    btn.textContent='🔓 Admin';
+    btn.classList.add('unlocked');btn.classList.remove('locked');
+  }else{
+    btn.textContent='🔒 Admin';
+    btn.classList.add('locked');btn.classList.remove('unlocked');
+  }
+}
 function toggleSettings(){
   const drawer=document.getElementById('settings-drawer');
   if(drawer.classList.contains('open')){drawer.classList.remove('open');return;}
@@ -576,7 +589,8 @@ function toggleSettings(){
       if(entered===null)return;
       if(entered!==ADMIN_PIN){showToast('❌ Incorrect PIN.');return;}
     }
-    isAdminUnlocked=true;sessionStorage.setItem('admin_unlocked','true');
+    isAdminUnlocked=true;
+    updateAdminBtn();
     render();
   }
   drawer.classList.add('open');
@@ -594,14 +608,16 @@ function changeAdminPin(){
   showToast('✓ Admin PIN updated.');
 }
 function lockAdmin(){
-  isAdminUnlocked=false;sessionStorage.removeItem('admin_unlocked');
+  isAdminUnlocked=false;
+  updateAdminBtn();
   document.getElementById('settings-drawer').classList.remove('open');
   showToast('🔒 Settings locked.');
   render();
 }
 function autoLockAdmin(){
   if(!isAdminUnlocked)return;
-  isAdminUnlocked=false;sessionStorage.removeItem('admin_unlocked');
+  isAdminUnlocked=false;
+  updateAdminBtn();
   document.getElementById('settings-drawer').classList.remove('open');
   render();
 }
@@ -1070,7 +1086,12 @@ function addManual(){
   calSel={m:null,d:null};document.querySelectorAll('.grp-chk').forEach(c=>c.checked=false);
   showToast(name+' added!');render();
 }
-function deleteBirthday(id){birthdays=birthdays.filter(b=>String(b.id)!==String(id));save();render();}
+function deleteBirthday(id){
+  const b=birthdays.find(x=>String(x.id)===String(id));
+  const name=b?b.name:'this staff member';
+  if(!confirm(`Delete ${name}? This can't be undone.`))return;
+  birthdays=birthdays.filter(b=>String(b.id)!==String(id));save();render();
+}
 
 function editBirthday(id){
   const b=birthdays.find(b=>String(b.id)===String(id));if(!b)return;
@@ -1226,7 +1247,6 @@ window.addEventListener('load',()=>{
 });
 document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
 document.addEventListener('visibilitychange',()=>{if(document.hidden)autoLockAdmin();});
-window.addEventListener('pagehide',()=>{sessionStorage.removeItem('admin_unlocked');});
 </script>
 </body>
 </html>
