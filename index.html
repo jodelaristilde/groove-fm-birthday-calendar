@@ -101,6 +101,9 @@ textarea{resize:vertical;min-height:60px}
 .iprev td{padding:5px 8px;border-bottom:0.5px solid #ede8d0;color:#333}
 .search-bar{position:relative;margin-bottom:.8rem}
 .search-bar input{padding-left:32px}
+.search-bar-lg{margin:0 -1rem 1rem}
+.search-bar-lg input{padding:16px 18px 16px 44px;font-size:16px;border-radius:0;border-left:0;border-right:0}
+.search-bar-lg .si{left:16px;font-size:17px}
 .si{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;pointer-events:none}
 #blist{margin:0 -1rem}
 .bitem{background:#fff;border:0;border-bottom:0.5px solid #ede8d0;border-radius:0;padding:1.1rem 1.25rem;margin-bottom:0;display:flex;align-items:center;gap:14px}
@@ -366,8 +369,8 @@ textarea{resize:vertical;min-height:60px}
 <div class="container">
 
   <!-- STAFF LIST -->
-  <div class="main-title">Staff birthdays</div>
-  <div class="search-bar"><span class="si">🔍</span><input type="text" id="s-inp" placeholder="Search staff..." oninput="render()"/></div>
+  <div class="main-title" style="font-size:30px;font-weight:700;text-align:center;letter-spacing:.06em;margin:1.4rem 0 1rem">Staff birthdays</div>
+  <div class="search-bar search-bar-lg"><span class="si">🔍</span><input type="text" id="s-inp" placeholder="Search staff..." oninput="render()"/></div>
   <div id="list-sec">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
       <span style="font-size:11px;font-weight:500;color:#0a1560;text-transform:uppercase;letter-spacing:.04em">Staff — <span id="cnt"></span></span>
