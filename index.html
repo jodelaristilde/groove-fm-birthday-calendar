@@ -120,15 +120,15 @@ textarea{resize:vertical;min-height:60px}
 .av-coral{background:#fef9e7;color:#B8860B}.av-pink{background:#f0ead0;color:#0a1560}.av-blue{background:#e8f4fd;color:#1a2a8a}
 .ii{flex:1;min-width:0}
 .in{font-size:18px;font-weight:700;display:flex;align-items:baseline;flex-wrap:wrap;gap:6px;max-width:100%}
-.idate{font-size:18px;font-weight:700;color:#d32f2f;margin-left:0;white-space:normal;min-width:0}
+.idate{font-size:18px;font-weight:400;color:#d32f2f;margin-left:0;white-space:normal;min-width:0}
 @media(max-width:420px){.in,.idate{font-size:clamp(13px,4.2vw,18px)}}
 .ibadges{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
 .ib{font-size:10px;padding:2px 6px;border-radius:8px}
 .ib-sms{color:#1a2a8a;background:#e8f4fd}.ib-grp{color:#0f766e;background:#e8f5f2}.ib-sent{background:#dcfce7;color:#15803d}.ib-notif{color:#B8860B;background:#fef9e7}
 .iact{display:flex;gap:5px;align-items:center;flex-shrink:0}
-.badge-today{background:#E1F5EE;color:#085041;font-size:12px;padding:4px 10px;border-radius:20px;font-weight:500}
-.badge-soon{background:#FAEEDA;color:#633806;font-size:12px;padding:4px 10px;border-radius:20px;font-weight:500}
-.badge-later{background:#f0ead0;color:#0a1560;font-size:12px;padding:4px 10px;border-radius:20px}
+.badge-today{background:#E1F5EE;color:#085041;font-size:16px;padding:6px 14px;border-radius:20px;font-weight:600}
+.badge-soon{background:#FAEEDA;color:#633806;font-size:16px;padding:6px 14px;border-radius:20px;font-weight:600}
+.badge-later{background:#f0ead0;color:#0a1560;font-size:16px;padding:6px 14px;border-radius:20px;font-weight:600}
 .btn-wa{background:#25D366;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer;font-family:inherit;font-weight:500;display:flex;align-items:center;gap:5px;white-space:nowrap}
 .btn-wa:hover{background:#1ebe59}
 .btn-del{background:transparent;border:0.5px solid #d4c5a0;border-radius:8px;padding:7px 10px;font-size:13px;cursor:pointer;color:#C9A84C;font-family:inherit}
@@ -1183,15 +1183,11 @@ function render(){
     const gid=(b.groupId||'').replace(/`/g,'\\`');
     const sent=hasAnySent(b.id);
     return`<div class="bitem" style="${sent?'opacity:.7':''}">
-      <div class="av ${b.color}">${getInits(b.name)}</div>
       <div class="ii">
         <div class="in">${b.name} <span class="idate">${fmtDate(b.date)}</span></div>
-        <div class="ibadges">
+        ${isAdminUnlocked?`<div class="ibadges">
           <span class="ib ib-sms">📱 SMS</span>
-          ${notifEnabled?'<span class="ib ib-notif">🔔 Alert</span>':''}
-          ${grp?`<span class="ib ib-grp">👥 ${grp.name}</span>`:''}
-          ${sent?'<span class="ib ib-sent">✓ Sent</span>':''}
-        </div>
+        </div>`:''}
       </div>
       <div class="iact">
         ${badge}
