@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <link rel="manifest" href="manifest.json"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
@@ -117,7 +120,7 @@ textarea{resize:vertical;min-height:60px}
 .av-coral{background:#fef9e7;color:#B8860B}.av-pink{background:#f0ead0;color:#0a1560}.av-blue{background:#e8f4fd;color:#1a2a8a}
 .ii{flex:1;min-width:0}
 .in{font-size:18px;font-weight:700}
-.idate{font-size:13px;color:#888;margin-top:2px}
+.idate{font-size:15px;color:#888;margin-top:3px;white-space:nowrap}
 .ibadges{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
 .ib{font-size:10px;padding:2px 6px;border-radius:8px}
 .ib-sms{color:#1a2a8a;background:#e8f4fd}.ib-grp{color:#0f766e;background:#e8f5f2}.ib-sent{background:#dcfce7;color:#15803d}.ib-notif{color:#B8860B;background:#fef9e7}
@@ -182,6 +185,11 @@ textarea{resize:vertical;min-height:60px}
 .nb-cal{margin-top:16px;width:100%;padding:16px;border:1px solid #C9A84C;border-radius:12px;background:#C9A84C;color:#0a1560;font-size:clamp(15px,4vw,19px);font-weight:600;font-family:inherit;cursor:pointer}
 .nb-cal:hover{background:#ddbb5e}
 @media(max-width:520px){.add-row{grid-template-columns:1fr 1fr}.add-row>*:last-child{grid-column:1/-1}.hol-grid{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:600px){
+  .bitem{flex-wrap:wrap}
+  .ii{flex:1 1 100%;order:1}
+  .iact{flex:1 1 100%;order:2;justify-content:space-between;margin-top:12px}
+}
 </style>
 </head>
 <body>
