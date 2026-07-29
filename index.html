@@ -109,12 +109,7 @@ textarea{resize:vertical;min-height:60px}
 .search-bar-lg .si{left:16px;font-size:17px}
 .si{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;pointer-events:none}
 #blist{margin:0 -1rem}
-.bitem{background:#fff;border:0;border-bottom:0.5px solid #ede8d0;border-radius:0;padding:1.1rem 1.25rem;margin-bottom:0;display:grid;grid-template-columns:170px 1fr 100px;align-items:center;gap:14px}
-.bitem.admin-row{grid-template-columns:170px 1fr 270px}
-.iname{justify-self:start;min-width:0;overflow:hidden}
-.in{font-size:18px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-.idate-col{justify-self:center;text-align:center;font-size:18px;font-weight:400;color:#d32f2f;white-space:nowrap}
-.iact{justify-self:end;display:flex;align-items:center;gap:5px}
+.bitem{background:#fff;border:0;border-bottom:0.5px solid #ede8d0;border-radius:0;padding:1.1rem 1.25rem;margin-bottom:0;display:flex;align-items:center;gap:14px}
 .bitem:nth-child(5n+1){border-left:5px solid #C9A84C}
 .bitem:nth-child(5n+2){border-left:5px solid #0a1560}
 .bitem:nth-child(5n+3){border-left:5px solid #B8860B}
@@ -123,14 +118,16 @@ textarea{resize:vertical;min-height:60px}
 .av{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:15px;flex-shrink:0}
 .av-purple{background:#f0ead0;color:#0a1560}.av-teal{background:#dbeafe;color:#1a2a8a}
 .av-coral{background:#fef9e7;color:#B8860B}.av-pink{background:#f0ead0;color:#0a1560}.av-blue{background:#e8f4fd;color:#1a2a8a}
-@media(max-width:420px){.in,.idate-col{font-size:clamp(13px,4.2vw,18px)}}
+.ii{flex:1;min-width:0}
+.in{font-size:18px;font-weight:700}
+.idate{font-size:14px;font-weight:400;color:#888;margin-left:8px;white-space:nowrap}
 .ibadges{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
 .ib{font-size:10px;padding:2px 6px;border-radius:8px}
 .ib-sms{color:#1a2a8a;background:#e8f4fd}.ib-grp{color:#0f766e;background:#e8f5f2}.ib-sent{background:#dcfce7;color:#15803d}.ib-notif{color:#B8860B;background:#fef9e7}
 .iact{display:flex;gap:5px;align-items:center;flex-shrink:0}
-.badge-today{background:#E1F5EE;color:#085041;font-size:16px;padding:6px 14px;border-radius:20px;font-weight:600}
-.badge-soon{background:#FAEEDA;color:#633806;font-size:16px;padding:6px 14px;border-radius:20px;font-weight:600}
-.badge-later{background:#f0ead0;color:#0a1560;font-size:16px;padding:6px 14px;border-radius:20px;font-weight:600}
+.badge-today{background:#E1F5EE;color:#085041;font-size:12px;padding:4px 10px;border-radius:20px;font-weight:500;white-space:nowrap;flex-shrink:0}
+.badge-soon{background:#FAEEDA;color:#633806;font-size:12px;padding:4px 10px;border-radius:20px;font-weight:500;white-space:nowrap;flex-shrink:0}
+.badge-later{background:#f0ead0;color:#0a1560;font-size:12px;padding:4px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0}
 .btn-wa{background:#25D366;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer;font-family:inherit;font-weight:500;display:flex;align-items:center;gap:5px;white-space:nowrap}
 .btn-wa:hover{background:#1ebe59}
 .btn-del{background:transparent;border:0.5px solid #d4c5a0;border-radius:8px;padding:7px 10px;font-size:13px;cursor:pointer;color:#C9A84C;font-family:inherit}
@@ -189,11 +186,9 @@ textarea{resize:vertical;min-height:60px}
 .nb-cal:hover{background:#ddbb5e}
 @media(max-width:520px){.add-row{grid-template-columns:1fr 1fr}.add-row>*:last-child{grid-column:1/-1}.hol-grid{grid-template-columns:repeat(4,1fr)}}
 @media(max-width:600px){
-  .bitem{grid-template-columns:110px 1fr 80px;column-gap:8px;padding:1rem}
-  .bitem.admin-row{grid-template-columns:110px 1fr 220px}
-  .in{font-size:15px}
-  .idate-col{font-size:14px;white-space:nowrap}
-  .iact{flex-wrap:wrap;justify-content:flex-end}
+  .bitem{flex-wrap:wrap}
+  .ii{flex:1 1 100%;order:1}
+  .iact{flex:1 1 100%;order:2;justify-content:space-between;margin-top:12px}
 }
 </style>
 </head>
@@ -596,12 +591,6 @@ function lockAdmin(){
   isAdminUnlocked=false;sessionStorage.removeItem('admin_unlocked');
   document.getElementById('settings-drawer').classList.remove('open');
   showToast('🔒 Settings locked.');
-  render();
-}
-function autoLockAdmin(){
-  if(!isAdminUnlocked)return;
-  isAdminUnlocked=false;sessionStorage.removeItem('admin_unlocked');
-  document.getElementById('settings-drawer').classList.remove('open');
   render();
 }
 
@@ -1192,14 +1181,17 @@ function render(){
     const ge=(b.gmsg||'').replace(/\\/g,'\\\\').replace(/`/g,'\\`');
     const gid=(b.groupId||'').replace(/`/g,'\\`');
     const sent=hasAnySent(b.id);
-    return`<div class="bitem${isAdminUnlocked?' admin-row':''}" style="${sent?'opacity:.7':''}">
-      <div class="iname">
-        <div class="in">${b.name}</div>
-        ${isAdminUnlocked?`<div class="ibadges">
-          <span class="ib ib-sms">📱 SMS</span>
-        </div>`:''}
+    return`<div class="bitem" style="${sent?'opacity:.7':''}">
+      <div class="av ${b.color}">${getInits(b.name)}</div>
+      <div class="ii">
+        <div class="in">${b.name} <span class="idate">${fmtDate(b.date)}</span></div>
+        <div class="ibadges">
+          <span class="ib ib-sms">📱 7AM SMS</span>
+          ${notifEnabled?'<span class="ib ib-notif">🔔 Alert</span>':''}
+          ${grp?`<span class="ib ib-grp">👥 ${grp.name}</span>`:''}
+          ${sent?'<span class="ib ib-sent">✓ Sent</span>':''}
+        </div>
       </div>
-      <div class="idate-col">${fmtDate(b.date)}</div>
       <div class="iact">
         ${badge}
         ${isAdminUnlocked?`<button class="btn-wa" style="${sent?'background:#888;':''}" onclick="openModal('${sid}',\`${pe}\`,\`${fe}\`,\`${me}\`,\`${gid}\`,\`${ge}\`)">${waIcon} ${sent?'Sent':'Send'}</button>
@@ -1224,8 +1216,6 @@ window.addEventListener('load',()=>{
   setTimeout(showNextBirthdayPopup,400);
 });
 document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
-document.addEventListener('visibilitychange',()=>{if(document.hidden)autoLockAdmin();});
-window.addEventListener('pagehide',()=>{sessionStorage.removeItem('admin_unlocked');});
 </script>
 </body>
 </html>
