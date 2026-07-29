@@ -452,8 +452,12 @@ const JSONBIN='https://api.jsonbin.io/v3';
 // shared data on load, no manual key/Bin-ID entry needed.
 const DEFAULT_JB_KEY='$2a$10$Ha4mJSdwIyLVzKR8vMjma.3qBb5VyNxIUkDDL3LeyckBbI4T4eb4G';
 const DEFAULT_BIN_ID='6a669014f5f4af5e29c52199';
-let BIN_ID=localStorage.getItem('jb_bin_id')||DEFAULT_BIN_ID;
-let JB_KEY=localStorage.getItem('jb_key')||DEFAULT_JB_KEY;
+let BIN_ID=DEFAULT_BIN_ID;
+let JB_KEY=DEFAULT_JB_KEY;
+// Overwrite any stale per-device values from before cloud sync was baked in,
+// so every device is guaranteed to be pointed at the same shared bin.
+localStorage.setItem('jb_bin_id',BIN_ID);
+localStorage.setItem('jb_key',JB_KEY);
 let birthdays=JSON.parse(localStorage.getItem('bdays_v7')||'[]');
 let groups=JSON.parse(localStorage.getItem('bday_groups')||'[]');
 let cardUrl=localStorage.getItem('bday_card')||null;
@@ -913,7 +917,7 @@ function checkAndFire(){
   const cfg=getTwilioCfg();
   // Birthday reminders
   todays.forEach(b=>{
-    const fn=b.name.split(' ')[0];
+    const fn=b.name;
     const cleaned=(b.phone||'').replace(/[\s\-\(\)]/g,'').replace('+','');
     const waLink='https://wa.me/'+cleaned+'?text='+encodeURIComponent(buildMsg(fn,b.msg||''));
     const grp=b.groupId?getGroup(b.groupId):null;
@@ -978,7 +982,7 @@ function showNextBirthdayPopup(){
   const withDays=birthdays.map(b=>({b,days:daysUntil(b.date)})).sort((x,y)=>x.days-y.days);
   const soonest=withDays[0].days;
   const group=withDays.filter(x=>x.days===soonest).map(x=>x.b);
-  const names=group.map(b=>b.name.split(' ')[0]);
+  const names=group.map(b=>b.name);
   const nameText=names.length>1?names.slice(0,-1).join(', ')+' & '+names[names.length-1]:names[0];
   document.getElementById('nb-name').textContent=nameText;
   document.getElementById('nb-date').textContent=fmtDate(group[0].date);
@@ -1137,13 +1141,13 @@ function removeHolCard(){holCardUrl=null;document.getElementById('h-card-showing
 function startHolBroadcast(){if(!birthdays.length){showToast('No staff added yet.');return;}const msg=document.getElementById('h-msg').value.trim();if(!msg){showToast('Please enter a message.');return;}holIdx=0;document.getElementById('hprog').style.display='block';sendNextHol();}
 function sendNextHol(){
   if(holIdx>=birthdays.length){document.getElementById('hpbar').style.width='100%';document.getElementById('hplbl').textContent='✓ All done! '+birthdays.length+' messages sent.';const btn=document.getElementById('h-send-btn');btn.textContent='✓ Sent to all '+birthdays.length+'!';btn.style.background='#15803d';showToast('🎉 Holiday broadcast complete!',5000);return;}
-  const b=birthdays[holIdx];const fn=b.name.split(' ')[0];const msg=document.getElementById('h-msg').value.trim();
+  const b=birthdays[holIdx];const fn=b.name;const msg=document.getElementById('h-msg').value.trim();
   const full=selHol.icon+' '+selHol.name+'\n\nDear '+fn+',\n'+msg;
   const cleaned=(b.phone||'').replace(/[\s\-\(\)]/g,'').replace('+','');const waUrl='https://wa.me/'+cleaned+'?text='+encodeURIComponent(full);
   const pct=Math.round(((holIdx+1)/birthdays.length)*100);document.getElementById('hpbar').style.width=pct+'%';document.getElementById('hplbl').textContent=(holIdx+1)+' of '+birthdays.length+' — '+b.name;
   const next=birthdays[holIdx+1];const mi=document.getElementById('m-img');if(holCardUrl){mi.src=holCardUrl;mi.style.display='block';}else mi.style.display='none';
   document.getElementById('m-title').textContent=selHol.icon+' '+selHol.name+' — '+b.name;
-  document.getElementById('m-body').innerHTML=`<p style="font-size:13px;color:#555;margin-bottom:10px;line-height:1.6">WhatsApp opens pre-filled for <strong>${b.name}</strong>. ${holCardUrl?'Attach the card, then hit':'Just hit'} <strong>Send</strong>.</p><p style="font-size:12px;color:#aaa;margin-bottom:10px">${birthdays.length-holIdx} remaining · next: ${next?next.name.split(' ')[0]:'last one!'}</p><button class="send-both" style="margin-bottom:8px" onclick="window.open('${waUrl.replace(/'/g,"\\'")}','_blank')">Open WhatsApp for ${fn} →</button><button class="arrow-btn personal" onclick="advanceHol()">✓ Sent — Next (${holIdx+1}/${birthdays.length})</button>`;
+  document.getElementById('m-body').innerHTML=`<p style="font-size:13px;color:#555;margin-bottom:10px;line-height:1.6">WhatsApp opens pre-filled for <strong>${b.name}</strong>. ${holCardUrl?'Attach the card, then hit':'Just hit'} <strong>Send</strong>.</p><p style="font-size:12px;color:#aaa;margin-bottom:10px">${birthdays.length-holIdx} remaining · next: ${next?next.name:'last one!'}</p><button class="send-both" style="margin-bottom:8px" onclick="window.open('${waUrl.replace(/'/g,"\\'")}','_blank')">Open WhatsApp for ${fn} →</button><button class="arrow-btn personal" onclick="advanceHol()">✓ Sent — Next (${holIdx+1}/${birthdays.length})</button>`;
   document.getElementById('modal').classList.add('open');
 }
 function advanceHol(){holIdx++;closeModal();setTimeout(sendNextHol,300);}
@@ -1161,7 +1165,7 @@ function render(){
   blist.innerHTML=sorted.map(b=>{
     const today=isToday(b.date);const days=daysUntil(b.date);
     const badge=today?'<span class="badge-today">🎂 Today!</span>':days<=7?`<span class="badge-soon">In ${days}d</span>`:`<span class="badge-later">In ${days}d</span>`;
-    const fn=b.name.split(' ')[0];const grp=b.groupId?getGroup(b.groupId):null;
+    const fn=b.name;const grp=b.groupId?getGroup(b.groupId):null;
     const sid=String(b.id).replace(/[^0-9.]/g,'');
     const pe=(b.phone||'').replace(/\\/g,'\\\\').replace(/`/g,'\\`');
     const fe=fn.replace(/\\/g,'\\\\').replace(/`/g,'\\`');
